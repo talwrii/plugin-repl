@@ -1,0 +1,11 @@
+{
+	"id": "tamper",
+	"name": "Tamper",
+	"version": "1.0.0",
+	"minAppVersion": "0.15.0",
+	"description": "Directly tamper with the obsidian api from a plugin",
+	"author": "Tal Wrii",
+	"authorUrl": "https://readwithai.substack.com",
+	"fundingUrl": "https://ko-fi.com/readwithai",
+	"isDesktopOnly": true
+}
