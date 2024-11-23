@@ -83,7 +83,7 @@ export default class MyPlugin extends Plugin {
 
         this.addCommand({
             id: 'repl-execute',
-            name: 'Execute the current line',
+            name: 'Execute the current line or selection',
             editorCallback: (editor: Editor, view: MarkdownView) => {
                 const cursor = editor.getCursor()
 
