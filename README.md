@@ -19,8 +19,19 @@ A "dir" method is provided to allow you to inspect objects. And various useful o
 
 You might like to [refer to the plugin documentation](https://docs.obsidian.md/Plugins/Getting+started/Build+a+plugin) at the same time.
 
-# About me
+# Installation
 
+In your obsidian vault there should be a `.obsidian/plugins` directory. You can clone this repo into that
+directory and then run
+
+```
+npm install
+npm run dev
+```
+
+To build the plugin. You should then be able to enable the plugin in the "Community Plugins" section of settings.
+
+# About me
 I'm [@readwithai](https://x.com/readwithai). I am interested in how AI (and other things) can increase access to information. I am an experiences emacs and org-mode user. I used to be quite into productivity tools.
 
 You can give me money of [ko-fi](https://ko-fi.com/readwithai) if you like.
