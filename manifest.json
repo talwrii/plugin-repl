@@ -1,9 +1,9 @@
 {
-	"id": "tamper",
-	"name": "Tamper",
+	"id": "obsidian-repl",
+	"name": "REPL",
 	"version": "1.0.0",
 	"minAppVersion": "0.15.0",
-	"description": "Directly tamper with the obsidian api from a plugin",
+	"description": "Provide an emacs-like read evaluate print loop to prototype plugins and do easy scripting",
 	"author": "Tal Wrii",
 	"authorUrl": "https://readwithai.substack.com",
 	"fundingUrl": "https://ko-fi.com/readwithai",
