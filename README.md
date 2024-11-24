@@ -22,14 +22,14 @@ You might like to [refer to the plugin documentation](https://docs.obsidian.md/P
 # Installation
 
 In your obsidian vault there should be a `.obsidian/plugins` directory. You can clone this repo into that
-directory and then run
+directory and then run the following to build the plugin:
 
 ```
 npm install
 npm run dev
 ```
 
-To build the plugin. You should then be able to enable the plugin in the "Community Plugins" section of settings.
+You should then be able to enable the plugin in the "Community Plugins" section of settings.
 
 # About me
 I'm [@readwithai](https://x.com/readwithai). I am interested in how AI (and other things) can increase access to information. I am an experiences emacs and org-mode user. I used to be quite into productivity tools.
