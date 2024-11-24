@@ -7,7 +7,6 @@ function evalInScope (s, context) {
     }
 }
 
-
 function makeScope (target) {
     return new Proxy(target, {
         has(target, prop) { return true; },
