@@ -13,9 +13,9 @@ You can then write javascript expressions and press CTRL-J (or run the related c
 You can also assign to variables, but you have to use the `var` keyword when doing so.
 A "dir" method is provided to allow you to inspect objects. And various useful objects are available.
 
-`plugin` is the plugin object for repl.
-`editor` is the editor object. You can use this to write to current-file
-`app` is the application object.
+* `plugin` is the plugin object for repl.
+* `editor` is the editor object. You can use this to write to current-file
+* `app` is the application object.
 
 You might like to [refer to the plugin documentation](https://docs.obsidian.md/Plugins/Getting+started/Build+a+plugin) at the same time.
 
