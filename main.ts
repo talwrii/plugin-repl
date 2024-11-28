@@ -1,4 +1,4 @@
-import { Editor, MarkdownView, Notice, Plugin } from 'obsidian';
+import { Editor, MarkdownView, Notice, Plugin, EditorPosition, App, Modal, Setting } from 'obsidian';
 
 import * as util from 'util'
 import * as evalScope from "./evalScope"
@@ -11,6 +11,13 @@ interface MyPluginSettings {
 
 const DEFAULT_SETTINGS: MyPluginSettings = {
     mySetting: 'default'
+}
+
+function makePlugin(app: any) {
+    function plugin(name: string) {
+        return app.plugins.plugins[name]
+    }
+    return plugin
 }
 
 
@@ -43,6 +50,85 @@ function dir(obj: any) {
     return p;
 }
 
+function message(s: string) {
+    new Notice(s)
+}
+
+
+function makeCommand(app: any) {
+    function command(id: string) {
+        app.commands.executeCommandById(id)
+    }
+    return command
+}
+
+function makeForwardChar(editor: Editor): (count: number | undefined) => void {
+    function forwardChar(count: number | undefined): void {
+        if (count === undefined) {
+            count = 1
+        }
+
+        let cursor = editor.getCursor()
+        cursor.ch += count
+        editor.setCursor(cursor)
+    }
+    return forwardChar
+}
+
+
+function makeInsert(editor: Editor): (s: string) => void {
+    function insert(s: string) {
+        editor.replaceRange(s, editor.getCursor())
+        makeForwardChar(editor)(s.length)
+    }
+    return insert
+}
+
+function makePointMax(editor: Editor): () => EditorPosition {
+    function pointMax() {
+        let lastLine = editor.lastLine()
+        let lastChar = editor.getLine(lastLine).length
+        return { line: lastLine, ch: lastChar }
+    }
+    return pointMax
+}
+
+function pointMin() {
+    return { line: 0, ch: 0 }
+}
+
+function makeBufferString(editor: Editor): () => string {
+    function bufferString() {
+        return editor.getRange(pointMin(), makePointMax(editor)())
+    }
+    return bufferString
+}
+
+function makeSaveExcursion(editor: Editor) {
+    function saveExcursion(f: () => any): void {
+        let point = editor.getCursor()
+        try {
+            return f()
+        } finally {
+            editor.setCursor(point)
+        }
+    }
+    return saveExcursion
+}
+
+
+function makeLineNumber(editor: Editor): () => number {
+    function lineNumber(): number {
+        return editor.getCursor().line
+    }
+    return lineNumber
+}
+
+function getResult(resultList: Array<any>, p: Promise<any>) {
+    // get a result out of a promise
+    p.then((x) => resultList.push(x)).catch((e) => message(e.message))
+}
+
 const formatObj = (x: any) => {
     console.log("formatting")
     if (x === undefined) {
@@ -72,66 +158,150 @@ const makeEndOfLine = (editor: any) => {
         editor.setCursor(cursor.line, line.length)
     }
 }
-
-export default class MyPlugin extends Plugin {
+export default class ReplPlugin extends Plugin {
     settings: MyPluginSettings;
     scope: Scope
+    history: History
+
+    runCommand(editor: Editor, view: MarkdownView, region: string) {
+        let output: string = "";
+
+        const endOfLine = makeEndOfLine(editor)
+
+        this.scope.add("saveExcursion", makeSaveExcursion(editor))
+
+        this.scope.add("lineNumber", makeLineNumber(editor))
+        this.scope.add("command", makeCommand(this.app))
+        this.scope.add("plugin", makePlugin(this.app))
+        this.scope.add("bufferString", makeBufferString(editor))
+        this.scope.add("insert", makeInsert(editor))
+        this.scope.add("pointMin", pointMin)
+        this.scope.add("pointMax", makePointMax(editor))
+        this.scope.add("forwardChar", makeForwardChar(editor))
+        this.scope.add("getResult", getResult)
+        this.scope.add("message", message)
+        this.scope.add("repl", this)
+        this.scope.add("workspace", this.app.workspace)
+        this.scope.add("app", this.app)
+        this.scope.add("editor", editor)
+        this.scope.add("view", view)
+        this.scope.add("endOfLine", endOfLine)
+        this.scope.add("dir", dir)
+        try {
+            output = formatObj(this.scope.eval(region))
+        } catch (e) {
+            new Notice(e.toString())
+            throw e
+        }
+        return output
+    }
 
     async onload() {
         this.scope = new Scope()
-        await this.loadSettings();
+        this.history = new History()
 
         this.addCommand({
-            id: 'repl-execute',
+            id: 'repl-enter',
             name: 'Execute the current line or selection',
             editorCallback: (editor: Editor, view: MarkdownView) => {
                 const cursor = editor.getCursor()
-
                 const region = editor.getSelection() || editor.getLine(cursor.line)
 
-                let output: string = "";
                 const endOfLine = makeEndOfLine(editor)
 
-                this.scope.add("plugin", this)
-                this.scope.add("app", this.app)
-                this.scope.add("editor", editor)
-                this.scope.add("view", view)
-                this.scope.add("endOfLine", endOfLine)
-                this.scope.add("dir", dir)
-                try {
-                    output = formatObj(this.scope.eval(region))
-                } catch (e) {
-                    new Notice(e.toString())
-                    return;
-                }
+                const output = this.runCommand(editor, view, region)
+
                 editor.setCursor(cursor.line + 1, 0)
                 editor.replaceRange(output + "\n", editor.getCursor())
                 endOfLine()
             }
         });
 
-
-        // This adds a settings tab so the user can configure various aspects of the plugin
-
-        // If the plugin hooks up any global DOM events (on parts of the app that doesn't belong to this plugin)
-        // Using this function will automatically remove the event listener when this plugin is disabled.
-        this.registerDomEvent(document, 'click', (evt: MouseEvent) => {
-            console.log('click', evt);
+        this.addCommand({
+            id: 'repl-exec',
+            name: 'Execute run like or selection (no result)',
+            editorCallback: (editor: Editor, view: MarkdownView) => {
+                const cursor = editor.getCursor()
+                const region = editor.getSelection() || editor.getLine(cursor.line)
+                this.runCommand(editor, view, region)
+            }
         });
 
-        // When registering intervals, this function will automatically clear the interval when the plugin is disabled.
-        this.registerInterval(window.setInterval(() => console.log('setInterval'), 5 * 60 * 1000));
+        this.addCommand({
+            id: 'repl-prompt-exec',
+            name: 'Read some javascript and run it',
+            editorCallback: (editor: Editor, view: MarkdownView) => {
+                let before = editor.getCursor()
+                new CommandModal(this.app, this.history, (result) => {
+                    let output = this.runCommand(editor, view, result)
+                    message(output)
+                    editor.setCursor(before)
+                }).open()
+            }
+        });
+    }
+}
+
+class History {
+    index: number
+    entries: Array<string>
+    constructor() {
+        this.index = 0
+        this.entries = []
     }
 
-    onunload() {
-
+    add(s: string): void {
+        this.entries.push(s)
+        this.index = this.entries.length - 1
     }
 
-    async loadSettings() {
-        this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
+    previous() {
+        let result = this.entries[this.index]
+        this.index = Math.max(this.index - 1, 0)
+        return result
     }
 
-    async saveSettings() {
-        await this.saveData(this.settings);
+    next() {
+        this.index = Math.min(this.index + 1, this.entries.length - 1)
+        let result = this.entries[this.index]
+        return result
+    }
+
+}
+
+class CommandModal extends Modal {
+    constructor(app: App, history: History, onSubmit: (result: string) => void) {
+        super(app);
+        this.setTitle('Execute javascript (press return)');
+
+        let enterDown = false;
+        let command = '';
+        new Setting(this.contentEl)
+            .setName('Javascript')
+            .addText((text) => {
+                text.inputEl.addEventListener("keydown", ({ key }) => {
+                    if (key === 'Enter') {
+                        enterDown = true
+                    }
+                })
+                text.inputEl.addEventListener("keyup", ({ key }) => {
+                    if ((key === 'Enter') && enterDown) {
+                        this.close()
+                        history.add(command)
+                        onSubmit(command)
+                        return true
+                    } else if (key === 'ArrowUp') {
+                        command = history.previous()
+                        text.inputEl.value = command
+                    } else if (key === 'ArrowDown') {
+                        command = history.next()
+                        text.inputEl.value = command
+                    }
+
+                })
+                text.onChange((value) => {
+                    command = value;
+                });
+            })
     }
 }

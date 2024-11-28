@@ -2,7 +2,7 @@ function evalInScope (s, context) {
     var result;
     context["_s"] = s
     with (makeScope(context)) {
-        result = eval(_s)
+        result = eval("(" + _s + ")")
         return result
     }
 }

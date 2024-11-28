@@ -1,5 +1,4 @@
 # Obsidian REPL plugin
-
 This plugin adds an emacs-like read evaluate print loop (REPL) to obsidian.
 This lets you execute javascript in a document *and* importantly interact with editor objects as though you were writing a plugin.
 This can be useful when developing plugins, or for "light-weight" scripting without having to develop a plugin.
@@ -13,14 +12,18 @@ You can then write javascript expressions and press CTRL-J (or run the related c
 You can also assign to variables, but you have to use the `var` keyword when doing so.
 A "dir" method is provided to allow you to inspect objects. And various useful objects are available.
 
-* `plugin` is the plugin object for repl.
+* `repl` is the plugin object for repl.
 * `editor` is the editor object. You can use this to write to current-file
 * `app` is the application object.
 
 You might like to [refer to the plugin documentation](https://docs.obsidian.md/Plugins/Getting+started/Build+a+plugin) at the same time.
 
-# Installation
+## Importing modules
+I experimented with the [obsidian modules](https://github.com/polyipseity/obsidian-modules) plugin but had issues importing full modules.
 
+The approach I have used to getting access to modules when hacking on a new plugin is to create a new plugin and half that plugin set `self.MODULE = MODULE` on load. You can then access this self open from the repl.
+
+# Installation
 In your obsidian vault there should be a `.obsidian/plugins` directory. You can clone this repo into that
 directory and then run the following to build the plugin:
 
