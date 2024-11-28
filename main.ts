@@ -40,10 +40,10 @@ class Scope {
 }
 
 function dir(obj: any) {
-    var p = [];
+    let p = [];
     for (; obj != null; obj = Object.getPrototypeOf(obj)) {
-        var op = Object.getOwnPropertyNames(obj);
-        for (var i = 0; i < op.length; i++)
+        const op = Object.getOwnPropertyNames(obj);
+        for (let i = 0; i < op.length; i++)
             if (p.indexOf(op[i]) == -1)
                 p.push(op[i]);
     }
@@ -86,8 +86,8 @@ function makeInsert(editor: Editor): (s: string) => void {
 
 function makePointMax(editor: Editor): () => EditorPosition {
     function pointMax() {
-        let lastLine = editor.lastLine()
-        let lastChar = editor.getLine(lastLine).length
+        const lastLine = editor.lastLine()
+        const lastChar = editor.getLine(lastLine).length
         return { line: lastLine, ch: lastChar }
     }
     return pointMax
@@ -106,7 +106,7 @@ function makeBufferString(editor: Editor): () => string {
 
 function makeSaveExcursion(editor: Editor) {
     function saveExcursion(f: () => any): void {
-        let point = editor.getCursor()
+        const point = editor.getCursor()
         try {
             return f()
         } finally {
@@ -226,9 +226,9 @@ export default class ReplPlugin extends Plugin {
             id: 'repl-prompt-exec',
             name: 'Read some javascript and run it',
             editorCallback: (editor: Editor, view: MarkdownView) => {
-                let before = editor.getCursor()
+                const before = editor.getCursor()
                 new CommandModal(this.app, this.history, (result) => {
-                    let output = this.runCommand(editor, view, result)
+                    const output = this.runCommand(editor, view, result)
                     message(output)
                     editor.setCursor(before)
                 }).open()
@@ -251,14 +251,14 @@ class History {
     }
 
     previous() {
-        let result = this.entries[this.index]
+        const result = this.entries[this.index]
         this.index = Math.max(this.index - 1, 0)
         return result
     }
 
     next() {
         this.index = Math.min(this.index + 1, this.entries.length - 1)
-        let result = this.entries[this.index]
+        const result = this.entries[this.index]
         return result
     }
 
