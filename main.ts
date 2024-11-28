@@ -124,10 +124,6 @@ function makeLineNumber(editor: Editor): () => number {
     return lineNumber
 }
 
-function getResult(resultList: Array<any>, p: Promise<any>) {
-    // get a result out of a promise
-    p.then((x) => resultList.push(x)).catch((e) => message(e.message))
-}
 
 const formatObj = (x: any) => {
     console.log("formatting")
@@ -178,7 +174,6 @@ export default class ReplPlugin extends Plugin {
         this.scope.add("pointMin", pointMin)
         this.scope.add("pointMax", makePointMax(editor))
         this.scope.add("forwardChar", makeForwardChar(editor))
-        this.scope.add("getResult", getResult)
         this.scope.add("message", message)
         this.scope.add("repl", this)
         this.scope.add("workspace", this.app.workspace)
@@ -297,7 +292,6 @@ class CommandModal extends Modal {
                         command = history.next()
                         text.inputEl.value = command
                     }
-
                 })
                 text.onChange((value) => {
                     command = value;

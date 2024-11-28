@@ -3,13 +3,10 @@ This plugin adds an emacs-like read evaluate print loop (REPL) to obsidian.
 This lets you execute javascript in a document *and* importantly interact with editor objects as though you were writing a plugin.
 This can be useful when developing plugins, or for "light-weight" scripting without having to develop a plugin.
 
-Over time various convenience functions may be added.
-
 # Using
 Install the plugin. I would advise binding CTRL-J to the commamd (Execute the current line or selection).
 
-You can then write javascript expressions and press CTRL-J (or run the related command) to execute these expressions.
-You can also assign to variables, but you have to use the `var` keyword when doing so.
+You can then write javascript expressions and then run commands to execute these expressions, return the result.
 A "dir" method is provided to allow you to inspect objects. And various useful objects are available.
 
 * `repl` is the plugin object for repl.
@@ -17,6 +14,21 @@ A "dir" method is provided to allow you to inspect objects. And various useful o
 * `app` is the application object.
 
 You might like to [refer to the plugin documentation](https://docs.obsidian.md/Plugins/Getting+started/Build+a+plugin) at the same time.
+
+## Convenience functions provided
+Various convenience functions are provided:
+
+* dir(o:Object) - List the property in an object
+* message(s:string) - Print a message
+* command(s:string) - Run a command
+* lineNumber - return the line number of the current line
+* plugin(s:string) - Get the object for a plugin
+* bufferString() - Return a string containing the entire text of the buffer
+* insert(s:string) - Insert a string into the buffer
+* pointMin() - Return the minimum cursor in the buffer
+* pointMax() - Return the maximun cursor in the buffer
+* forwardChar(count?) - Move count (or one) character forward
+
 
 ## Importing modules
 I experimented with the [obsidian modules](https://github.com/polyipseity/obsidian-modules) plugin but had issues importing full modules.
@@ -35,8 +47,9 @@ npm run dev
 You should then be able to enable the plugin in the "Community Plugins" section of settings.
 
 # About me
-I'm [@readwithai](https://x.com/readwithai). I am interested in how AI (and other things) can increase access to information. I am an experiences emacs and org-mode user. I used to be quite into productivity tools.
+I make productivity tools and AI tools related to reading and research.
+If that sounds interesting you can follow me on <a href="https://x.com/readwithai">twitter</a> or <a href="https://bsky.app/profile/readwithai.bsky.social">bluesky</a>.
 
-You can give me money of [ko-fi](https://ko-fi.com/readwithai) if you like.
+I write about these topics on <a href="https://readwithai.substack.com/readwithai">substack</a>.
 
-You might be interested in some other tools that I have made.
+If you find *this* piece of software useful. Maybe give me money (like $2 dollars?) on my <a href="ko-fi.com/readwithai">kofi</a>.
