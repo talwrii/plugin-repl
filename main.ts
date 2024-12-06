@@ -34,7 +34,6 @@ class Scope {
     }
 
     eval(s: string) {
-        console.log("scope s:" + s)
         return evalScope.evalInScope(s, this.context)
     }
 }
@@ -126,7 +125,6 @@ function makeLineNumber(editor: Editor): () => number {
 
 
 const formatObj = (x: any) => {
-    console.log("formatting")
     if (x === undefined) {
         return "undefined";
     } else if (typeof x === "string") {
@@ -142,7 +140,6 @@ const formatObj = (x: any) => {
     } else if (x.constructor === Object) {
         return util.inspect(x)
     } else {
-        console.log(x.constructor.name)
         return `[${x.constructor.name} object]`
     }
 }
