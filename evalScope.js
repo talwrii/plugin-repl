@@ -2,10 +2,11 @@ function evalInScope (s, context) {
     var result;
     context["_s"] = s
     with (makeScope(context)) {
-        if (_s.startsWith("var ")) {
-            result = eval(_s)
-        } else {
+        if (/^ *\{/.test(_s)) {
+            // object literal
             result = eval("(" + _s + ")")
+        } else {
+            result = eval(_s)
         }
         return result
     }
