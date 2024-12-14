@@ -1,5 +1,5 @@
 # Obsidian REPL plugin
-* [@readwithai](https://x.com/readwithai), [blog post](https://medium.com/@readwithai/slowly-turning-obsidian-into-emacs-adding-a-repl-37b280398739)
+*[@readwithai](https://x.com/readwithai), [blog post](https://medium.com/@readwithai/slowly-turning-obsidian-into-emacs-adding-a-repl-37b280398739)*
 
 
 This plugin adds an emacs-like read evaluate print loop (REPL) to obsidian.
