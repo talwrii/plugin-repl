@@ -1,16 +1,27 @@
 function evalInScope (s, context) {
-    var result;
+    let _result;
     context["_s"] = s
     with (makeScope(context)) {
         if (/^ *\{/.test(_s)) {
             // object literal
-            result = eval("(" + _s + ")")
+            _result = eval("(" + _s + ")")
         } else {
-            result = eval(_s)
+            _result = eval(_s)
         }
-        return result
+
+        return _result
     }
 }
+
+function runInScope(f, context) {
+    let _result;
+    context["f"] = f
+    with (makeScope(context)) {
+        _result = f()
+        return _result
+    }
+}
+
 
 function makeScope (target) {
     return new Proxy(target, {
@@ -21,3 +32,4 @@ function makeScope (target) {
 
 exports["evalInScope"] = evalInScope
 exports["makeScope"] = makeScope
+exports["runInScope"] = runInScope

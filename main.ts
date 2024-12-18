@@ -5,12 +5,24 @@ import * as evalScope from "./evalScope"
 
 // Remember to rename these classes and interfaces!
 
+type Cursor = {
+    line: number
+    ch: number
+}
+
 interface MyPluginSettings {
     mySetting: string;
 }
 
 const DEFAULT_SETTINGS: MyPluginSettings = {
     mySetting: 'default'
+}
+
+function makeOpen(app: any) {
+    function open(name: string) {
+        app.workspace.openLinkText(name)
+    }
+    return open
 }
 
 function makePlugin(app: any) {
@@ -36,7 +48,13 @@ class Scope {
     eval(s: string) {
         return evalScope.evalInScope(s, this.context)
     }
+
+    run(f: any) {
+        return evalScope.runInScope(f, this.context)
+    }
 }
+
+
 
 function dir(obj: any) {
     let p = [];
@@ -60,6 +78,60 @@ function makeCommand(app: any) {
     }
     return command
 }
+
+function makeLineAtPoint(editor: Editor) {
+    function lineAtPoint() {
+        return editor.getLine(editor.getCursor().line)
+    }
+    return lineAtPoint
+}
+
+function makeSelection(editor: Editor) {
+    function selection() {
+        let selection = editor.getSelection()
+        if (selection === "") {
+            throw Error("No text is selected")
+        }
+        return selection
+    }
+    return selection
+}
+
+
+function makeReadFile(app: any) {
+    const readFile = function(name: string) {
+        name = name + ".md"
+        const file = app.vault.getAbstractFileByPath(name)
+        return app.vault.read(file)
+    }
+    return readFile
+}
+
+
+function makeWriteToFile(app: any) {
+    const writeToFile = function(name: string, text: string) {
+        name = name + ".md"
+        const file = app.vault.getAbstractFileByPath(name)
+        return app.vault.modify(file, text)
+    }
+    return writeToFile
+}
+
+function makeAppendToFile(app: any) {
+    const writeToFile = makeWriteToFile(app)
+    const readFile = makeReadFile(app)
+    async function appendToFile(name: string, appended: string) {
+        let existing = await readFile(name)
+        if (existing === undefined) {
+            existing = ""
+        }
+        const content = existing + appended
+        await writeToFile(name, content)
+    }
+    return appendToFile
+}
+
+
 
 function makeForwardChar(editor: Editor): (count: number | undefined) => void {
     function forwardChar(count: number | undefined): void {
@@ -92,15 +164,31 @@ function makePointMax(editor: Editor): () => EditorPosition {
     return pointMax
 }
 
-function pointMin() {
+function pointMin(): Cursor {
     return { line: 0, ch: 0 }
 }
 
 function makeBufferString(editor: Editor): () => string {
-    function bufferString() {
-        return editor.getRange(pointMin(), makePointMax(editor)())
+    function bufferString(start?: Cursor, end?: Cursor) {
+        return editor.getRange(start || pointMin(), end || makePointMax(editor)())
     }
     return bufferString
+}
+
+
+function makePoint(editor: Editor) {
+    function point(): Cursor {
+        return editor.getCursor("to")
+    }
+    return point
+}
+
+
+function makeMark(editor: Editor) {
+    function mark() {
+        return editor.getCursor("from")
+    }
+    return mark
 }
 
 function makeSaveExcursion(editor: Editor) {
@@ -151,36 +239,84 @@ const makeEndOfLine = (editor: any) => {
         editor.setCursor(cursor.line, line.length)
     }
 }
+
 export default class ReplPlugin extends Plugin {
     settings: MyPluginSettings;
     scope: Scope
     history: History
+    initLoaded: boolean = false
+
+    updateScopeApp() {
+        this.scope.add("repl", this)
+        this.scope.add("dir", dir)
+        this.scope.add("newCommand", this.makeNewCommand())
+        this.scope.add("source", this.makeSource(this.app))
+        this.scope.add("plugin", makePlugin(this.app))
+        this.scope.add("command", makeCommand(this.app))
+        this.scope.add("readFile", makeReadFile(this.app))
+        this.scope.add("writeToFile", makeWriteToFile(this.app))
+        this.scope.add("appendToFile", makeAppendToFile(this.app))
+        this.scope.add("app", this.app)
+        this.scope.add("message", message)
+        this.scope.add("workspace", this.app.workspace)
+        this.scope.add("open", makeOpen(this.app))
+    }
+
+    updateScopeEditor(editor: Editor, view: MarkdownView) {
+        this.scope.add("endOfLine", makeEndOfLine(editor))
+        this.scope.add("saveExcursion", makeSaveExcursion(editor))
+        this.scope.add("lineNumber", makeLineNumber(editor))
+        this.scope.add("lineAtPoint", makeLineAtPoint(editor))
+        this.scope.add("bufferString", makeBufferString(editor))
+        this.scope.add("point", makePoint(editor))
+        this.scope.add("mark", makeMark(editor))
+        this.scope.add("insert", makeInsert(editor))
+        this.scope.add("pointMin", pointMin)
+        this.scope.add("pointMax", makePointMax(editor))
+        this.scope.add("selection", makeSelection(editor))
+        this.scope.add("forwardChar", makeForwardChar(editor))
+        this.scope.add("editor", editor)
+        this.scope.add("view", view)
+    }
+
+
+    makeNewCommand() {
+        let plugin = this
+        function newCommand(f: any) {
+            plugin.addCommand({
+                id: f.name,
+                name: f.name.replace("_", " "),
+                editorCallback: (editor: Editor, view: MarkdownView) => {
+                    plugin.updateScopeApp()
+                    plugin.updateScopeEditor(editor, view)
+                    plugin.scope.run(f)
+                }
+            });
+            return f
+        }
+        return newCommand
+    }
 
     runCommand(editor: Editor, view: MarkdownView, region: string) {
         let output: string = "";
 
-        const endOfLine = makeEndOfLine(editor)
+        this.updateScopeApp()
+        this.updateScopeEditor(editor, view)
 
-        this.scope.add("saveExcursion", makeSaveExcursion(editor))
-
-        this.scope.add("lineNumber", makeLineNumber(editor))
-        this.scope.add("command", makeCommand(this.app))
-        this.scope.add("plugin", makePlugin(this.app))
-        this.scope.add("bufferString", makeBufferString(editor))
-        this.scope.add("insert", makeInsert(editor))
-        this.scope.add("pointMin", pointMin)
-        this.scope.add("pointMax", makePointMax(editor))
-        this.scope.add("forwardChar", makeForwardChar(editor))
-        this.scope.add("message", message)
-        this.scope.add("repl", this)
-        this.scope.add("workspace", this.app.workspace)
-        this.scope.add("app", this.app)
-        this.scope.add("editor", editor)
-        this.scope.add("view", view)
-        this.scope.add("endOfLine", endOfLine)
-        this.scope.add("dir", dir)
         try {
-            output = formatObj(this.scope.eval(region))
+            let result = this.scope.eval(region)
+
+            const scope = this.scope
+
+            if (result instanceof Promise) {
+                result.then((x) => {
+                    scope.add("_", x)
+                }).catch((e) => {
+                    scope.add("_error", e)
+                })
+            }
+
+            output = formatObj(result)
         } catch (e) {
             new Notice(e.toString())
             throw e
@@ -191,21 +327,61 @@ export default class ReplPlugin extends Plugin {
     async onload() {
         this.scope = new Scope()
         this.history = new History()
+        this.addCommands()
 
+        this.initLoaded = false
+        let plugin = this
+        this.app.workspace.on('active-leaf-change', () => { plugin.loadInit() })
+    }
+
+    makeSource(app: any) {
+        const plugin = this
+        async function source(name: string) {
+            plugin.updateScopeApp()
+            let path = name + ".md"
+            const file: string = await app.vault.getAbstractFileByPath(path)
+            const contents = await app.vault.read(file)
+            plugin.scope.eval(contents)
+        }
+        return source
+    }
+
+    async loadInit() {
+        if (!this.initLoaded) {
+            let exists = await this.app.vault.exists("repl.md")
+            let source = this.makeSource(this.app)
+            if (exists) {
+                source("repl")
+            }
+            this.initLoaded = true
+        }
+    }
+
+    //@ts-ignore
+    //if (await this.app.vault.exists("repl.md")) {
+    //    await source("repl")
+    //}
+
+
+    addCommands() {
         this.addCommand({
             id: 'repl-enter',
             name: 'Execute the current line or selection',
             editorCallback: (editor: Editor, view: MarkdownView) => {
-                const cursor = editor.getCursor()
-                const region = editor.getSelection() || editor.getLine(cursor.line)
+                try {
+                    const cursor = editor.getCursor()
+                    const region = editor.getSelection() || editor.getLine(cursor.line)
 
-                const endOfLine = makeEndOfLine(editor)
+                    const endOfLine = makeEndOfLine(editor)
 
-                const output = this.runCommand(editor, view, region)
+                    const output = this.runCommand(editor, view, region)
 
-                editor.setCursor(cursor.line + 1, 0)
-                editor.replaceRange(output + "\n", editor.getCursor())
-                endOfLine()
+                    editor.setCursor(cursor.line + 1, 0)
+                    editor.replaceRange(output + "\n", editor.getCursor())
+                    endOfLine()
+                } catch (e) {
+                    message(e.message)
+                }
             }
         });
 

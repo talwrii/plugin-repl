@@ -1,7 +1,11 @@
 # Obsidian REPL plugin
 This plugin adds an emacs-like read evaluate print loop (REPL) to obsidian.
-This lets you execute javascript in a document *and* importantly interact with editor objects as though you were writing a plugin.
-This can be useful when developing plugins, or for "light-weight" scripting without having to develop a plugin.
+This lets you execute javascript in a document *and* importantly interact with Obsidian's
+plugin api to perform actions in Obsidian.
+
+This can be useful when developing plugins, or for "light-weight" scripting without having to develop a full plugin yourself.
+
+A range of convenience functions partly inspired my emacs is also provided.
 
 # Using
 Install the plugin. I would advise binding CTRL-J to the commamd (Execute the current line or selection).
@@ -18,17 +22,50 @@ You might like to [refer to the plugin documentation](https://docs.obsidian.md/P
 ## Convenience functions provided
 Various convenience functions are provided:
 
+* open(f:string) - Open a file in the current frame
 * dir(o:Object) - List the property in an object
 * message(s:string) - Print a message
 * command(s:string) - Run a command
 * lineNumber - return the line number of the current line
 * plugin(s:string) - Get the object for a plugin
 * bufferString() - Return a string containing the entire text of the buffer
+* bufferString(start, end) - Return the string between these two cursor positions (editor.getCursor())
+* point() - Return the current cursor position
+* mark() - Return the cursor position at the  beginning of the selection
 * insert(s:string) - Insert a string into the buffer
 * pointMin() - Return the minimum cursor in the buffer
 * pointMax() - Return the maximun cursor in the buffer
 * forwardChar(count?) - Move count (or one) character forward
+* writeToFile(name, string) - Overwrite the markdown file called name with the given string
+* appendToFile(name, string) - Append to the markdown file called `name` with the given string
+* selection() - Get the text contained in the selection
 
+## Defining commands
+<a name="commands"></a>
+The function `makeNewCommand` will create a new command from a function. You can then
+define a hotkey to this command.
+
+```js
+makeNewCommand(function new_command_name() {
+...
+})
+```
+
+creates a command with the name "new command name" (and the id `new_command_name`).
+You can use all repl's extra functions and variables (`app`, `editor` etc) in this function.
+
+If you want to test this funtion by hand you can do the following
+
+```js
+var f = makeNewCommand(function new_command_name() {
+...
+})
+```
+
+You can then call f() using eval to test the function.
+
+# Running code at startup
+If you want code to run at startup, such as for [defining commands](#commands) then you can place this code in a special file called `repl.md`. If this file exists it is read when obsidian starts (or is reloaded) and the code in it is executed.
 
 ## Importing modules
 I experimented with the [obsidian modules](https://github.com/polyipseity/obsidian-modules) plugin but had issues importing full modules.
