@@ -285,7 +285,7 @@ export default class ReplPlugin extends Plugin {
         function newCommand(f: any) {
             plugin.addCommand({
                 id: f.name,
-                name: f.name.replace("_", " "),
+                name: f.name.replaceAll("_", " "),
                 editorCallback: (editor: Editor, view: MarkdownView) => {
                     plugin.updateScopeApp()
                     plugin.updateScopeEditor(editor, view)
