@@ -23,6 +23,8 @@ You might like to [refer to the plugin documentation](https://docs.obsidian.md/P
 Various convenience functions are provided:
 
 * open(f:string) - Open a file in the current frame
+* source(f:string) - Open the markdown file called f and execute the code in it
+
 * dir(o:Object) - List the property in an object
 * message(s:string) - Print a message
 * command(s:string) - Run a command
