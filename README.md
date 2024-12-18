@@ -1,14 +1,22 @@
 # Obsidian REPL plugin
-*[@readwithai](https://x.com/readwithai), [blog post](https://medium.com/@readwithai/slowly-turning-obsidian-into-emacs-adding-a-repl-37b280398739)*
-
-
-This plugin adds an emacs-like read evaluate print loop (REPL) to obsidian.
-This lets you execute javascript in a document *and* importantly interact with Obsidian's
-plugin api to perform actions in Obsidian.
+This plugin adds an emacs-like read evaluate print loop (REPL) to Obsidian.
+This lets you execute javascript directly in a document *and*, importantly, interact with Obsidian's
+plugin api makes Obsidian do things (like move the cursor, insert text, open files, etc).
 
 This can be useful when developing plugins, or for "light-weight" scripting without having to develop a full plugin yourself.
 
-A range of convenience functions partly inspired my emacs is also provided.
+A range of convenience functions partly inspired by emacs is also provided.
+
+# Installation
+In your obsidian vault there should be a `.obsidian/plugins` directory. You can clone this repo into that
+directory and then run the following to build the plugin:
+
+```
+npm install
+npm run dev
+```
+
+You should then be able to enable the plugin in the "Community Plugins" section of settings.
 
 # Using
 Install the plugin. I would advise binding CTRL-J to the commamd (Execute the current line or selection).
@@ -77,16 +85,6 @@ I experimented with the [obsidian modules](https://github.com/polyipseity/obsidi
 
 The approach I have used to getting access to modules when hacking on a new plugin is to create a new plugin and half that plugin set `self.MODULE = MODULE` on load. You can then access this self open from the repl.
 
-# Installation
-In your obsidian vault there should be a `.obsidian/plugins` directory. You can clone this repo into that
-directory and then run the following to build the plugin:
-
-```
-npm install
-npm run dev
-```
-
-You should then be able to enable the plugin in the "Community Plugins" section of settings.
 
 # About me
 I make productivity tools and AI tools related to reading and research.
