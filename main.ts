@@ -331,6 +331,7 @@ export default class ReplPlugin extends Plugin {
 
         this.initLoaded = false
         let plugin = this
+        // This approach is stolen from vimrc - this event runs on startup (and lots of times after)
         this.app.workspace.on('active-leaf-change', () => { plugin.loadInit() })
     }
 
