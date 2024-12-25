@@ -83,6 +83,24 @@ If you want code to run at startup, such as for [defining commands](#commands) t
 # Asynchronous code
 For convenience, if you call an asynchronous function, plugin repl will store the result of the call in the underscore variable (`_`) or, if there was an error, the error is stored in `_error`.
 
+<<<<<<< HEAD
+=======
+## Dataview support
+The [dataview plugin](https://blacksmithgu.github.io/obsidian-dataview/) provides
+functionality to query your obsidian vault. For example, it can return pages or bullet points that match a particular query.
+
+If you have installed the dataview plugin, plugin repl gives you access to a dataview object `dv` which can be used to query pages.
+
+
+The following code returns the first list of the page called `templates/daily.md`.
+
+```javascript
+dv = getDv()
+dv.pages().filter((x) => x.file.path == "templates/daily.md")[0].file.lists[0]
+```
+
+
+>>>>>>> 95d4e2d (Document dataview support and asynchronous functions)
 ## Importing modules
 I experimented with the [obsidian modules](https://github.com/polyipseity/obsidian-modules) plugin but had issues importing full modules.
 
