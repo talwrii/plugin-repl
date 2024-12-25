@@ -1,7 +1,6 @@
 # Obsidian REPL plugin
 This plugin adds an emacs-like read evaluate print loop (REPL) to Obsidian.
-This lets you execute javascript directly in a document *and*, importantly, interact with Obsidian's
-plugin api makes Obsidian do things (like move the cursor, insert text, open files, etc).
+This lets you execute javascript directly in a document *and*, importantly, interact with Obsidian's plugin api to make Obsidian do things (like move the cursor, insert text, open files, etc).
 
 This can be useful when developing plugins, or for "light-weight" scripting without having to develop a full plugin yourself.
 
@@ -52,6 +51,7 @@ Various convenience functions are provided:
 * writeToFile(name, string) - Overwrite the markdown file called name with the given string
 * appendToFile(name, string) - Append to the markdown file called `name` with the given string
 * selection() - Get the text contained in the selection
+* getDv() - Get the dataview object
 
 ## Defining commands
 <a name="commands"></a>

@@ -117,6 +117,19 @@ function makeWriteToFile(app: any) {
     return writeToFile
 }
 
+function makeGetDv(app: any) {
+    function getDv() {
+        let plugin = makePlugin(app)
+        let p = plugin("dataview")
+        if (p === undefined) {
+            throw new Error("dataview plugin is missing. Is it installed?")
+        }
+        return p.localApi()
+    }
+    return getDv
+}
+
+
 function makeAppendToFile(app: any) {
     const writeToFile = makeWriteToFile(app)
     const readFile = makeReadFile(app)
@@ -255,6 +268,7 @@ export default class ReplPlugin extends Plugin {
         this.scope.add("command", makeCommand(this.app))
         this.scope.add("readFile", makeReadFile(this.app))
         this.scope.add("writeToFile", makeWriteToFile(this.app))
+        this.scope.add("getDv", makeGetDv(this.app))
         this.scope.add("appendToFile", makeAppendToFile(this.app))
         this.scope.add("app", this.app)
         this.scope.add("message", message)
@@ -411,33 +425,6 @@ export default class ReplPlugin extends Plugin {
     }
 }
 
-class History {
-    index: number
-    entries: Array<string>
-    constructor() {
-        this.index = 0
-        this.entries = []
-    }
-
-    add(s: string): void {
-        this.entries.push(s)
-        this.index = this.entries.length - 1
-    }
-
-    previous() {
-        const result = this.entries[this.index]
-        this.index = Math.max(this.index - 1, 0)
-        return result
-    }
-
-    next() {
-        this.index = Math.min(this.index + 1, this.entries.length - 1)
-        const result = this.entries[this.index]
-        return result
-    }
-
-}
-
 class CommandModal extends Modal {
     constructor(app: App, history: History, onSubmit: (result: string) => void) {
         super(app);
@@ -472,4 +459,32 @@ class CommandModal extends Modal {
                 });
             })
     }
+}
+
+
+class History {
+    index: number
+    entries: Array<string>
+    constructor() {
+        this.index = 0
+        this.entries = []
+    }
+
+    add(s: string): void {
+        this.entries.push(s)
+        this.index = this.entries.length - 1
+    }
+
+    previous() {
+        const result = this.entries[this.index]
+        this.index = Math.max(this.index - 1, 0)
+        return result
+    }
+
+    next() {
+        this.index = Math.min(this.index + 1, this.entries.length - 1)
+        const result = this.entries[this.index]
+        return result
+    }
+
 }
