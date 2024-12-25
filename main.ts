@@ -265,6 +265,7 @@ export default class ReplPlugin extends Plugin {
         this.scope.add("newCommand", this.makeNewCommand())
         this.scope.add("source", this.makeSource(this.app))
         this.scope.add("plugin", makePlugin(this.app))
+        this.scope.add("promptString", makePromptString(this.app))
         this.scope.add("command", makeCommand(this.app))
         this.scope.add("readFile", makeReadFile(this.app))
         this.scope.add("writeToFile", makeWriteToFile(this.app))
@@ -487,4 +488,49 @@ class History {
         return result
     }
 
+}
+
+
+function makePromptString(app: App) {
+    async function promptString(prompt: string) {
+        return new Promise((resolve, reject) => {
+            try {
+                new PromptModal(app, prompt, [resolve, reject]).open()
+            } catch (e) {
+                reject(e)
+            }
+        })
+    }
+    return promptString
+}
+
+
+class PromptModal extends Modal {
+    constructor(app: App, prompt: string, onSubmit: [resolve: (_: any) => void, reject: (_: any) => void]) {
+        super(app);
+        this.setTitle(prompt);
+        let [resolve, reject] = onSubmit
+
+        let enterDown = false;
+        let result = '';
+        new Setting(this.contentEl)
+            .setName(prompt)
+            .addText((text) => {
+                text.inputEl.addEventListener("keydown", ({ key }) => {
+                    if (key === 'Enter') {
+                        enterDown = true
+                    }
+                })
+                text.inputEl.addEventListener("keyup", ({ key }) => {
+                    if ((key === 'Enter') && enterDown) {
+                        this.close()
+                        resolve(result)
+                        return true
+                    }
+                })
+                text.onChange((value) => {
+                    result = value;
+                });
+            })
+    }
 }
