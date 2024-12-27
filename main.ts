@@ -18,11 +18,11 @@ const DEFAULT_SETTINGS: MyPluginSettings = {
     mySetting: 'default'
 }
 
-function makeOpen(app: any) {
-    function open(name: string) {
+function makeOpenFile(app: any) {
+    function openFile(name: string) {
         app.workspace.openLinkText(name)
     }
-    return open
+    return openFile
 }
 
 function makePlugin(app: any) {
@@ -224,10 +224,18 @@ function makeLineNumber(editor: Editor): () => number {
     return lineNumber
 }
 
+function openUrl(url: string) {
+    window.open(url) // returns null for some reason
+    return undefined
+}
+
 
 const formatObj = (x: any) => {
     if (x === undefined) {
-        return "undefined";
+        return "undefined"
+    }
+    else if (x === null) {
+        return "null"
     } else if (typeof x === "string") {
         return x.toString()
     } else if (typeof x === "boolean") {
@@ -274,7 +282,8 @@ export default class ReplPlugin extends Plugin {
         this.scope.add("app", this.app)
         this.scope.add("message", message)
         this.scope.add("workspace", this.app.workspace)
-        this.scope.add("open", makeOpen(this.app))
+        this.scope.add("openFile", makeOpenFile(this.app))
+        this.scope.add("openUrl", openUrl)
     }
 
     updateScopeEditor(editor: Editor, view: MarkdownView) {
@@ -373,12 +382,6 @@ export default class ReplPlugin extends Plugin {
         }
     }
 
-    //@ts-ignore
-    //if (await this.app.vault.exists("repl.md")) {
-    //    await source("repl")
-    //}
-
-
     addCommands() {
         this.addCommand({
             id: 'repl-enter',
@@ -391,6 +394,10 @@ export default class ReplPlugin extends Plugin {
                     const endOfLine = makeEndOfLine(editor)
 
                     const output = this.runCommand(editor, view, region)
+
+                    if (editor.getCursor().line == editor.lastLine()) {
+                        editor.replaceRange("\n", editor.getCursor())
+                    }
 
                     editor.setCursor(cursor.line + 1, 0)
                     editor.replaceRange(output + "\n", editor.getCursor())
