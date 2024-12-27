@@ -2,6 +2,9 @@ import { Editor, MarkdownView, Notice, Plugin, EditorPosition, App, Modal, Setti
 
 import * as util from 'util'
 import * as evalScope from "./evalScope"
+import { FuzzySelector } from './fuzzy'
+import { PromptStringModal } from './promptString'
+
 
 // Remember to rename these classes and interfaces!
 
@@ -30,6 +33,30 @@ function makePlugin(app: any) {
         return app.plugins.plugins[name]
     }
     return plugin
+}
+
+
+function makeFuzzySelect(app: App) {
+    function fuzzySelect(choices: Array<string>, prompt?: string) {
+        return new Promise((reject, resolve) => {
+            let selector = new FuzzySelector(app, prompt || "select:", choices, [reject, resolve])
+            selector.run()
+        })
+    }
+    return fuzzySelect
+}
+
+function makePromptString(app: App) {
+    async function promptString(prompt: string) {
+        return new Promise((resolve, reject) => {
+            try {
+                new PromptStringModal(app, prompt, [resolve, reject]).open()
+            } catch (e) {
+                reject(e)
+            }
+        })
+    }
+    return promptString
 }
 
 
@@ -96,6 +123,7 @@ function makeSelection(editor: Editor) {
     }
     return selection
 }
+
 
 
 function makeReadFile(app: any) {
@@ -270,6 +298,10 @@ export default class ReplPlugin extends Plugin {
     updateScopeApp() {
         this.scope.add("repl", this)
         this.scope.add("dir", dir)
+
+        // @ts-ignore path does exist
+        this.scope.add("path", this.app.workspace?.activeLeaf?.view?.path)
+
         this.scope.add("newCommand", this.makeNewCommand())
         this.scope.add("source", this.makeSource(this.app))
         this.scope.add("plugin", makePlugin(this.app))
@@ -283,6 +315,7 @@ export default class ReplPlugin extends Plugin {
         this.scope.add("message", message)
         this.scope.add("workspace", this.app.workspace)
         this.scope.add("openFile", makeOpenFile(this.app))
+        this.scope.add("fuzzySelect", makeFuzzySelect(this.app))
         this.scope.add("openUrl", openUrl)
     }
 
@@ -337,6 +370,7 @@ export default class ReplPlugin extends Plugin {
                     scope.add("_", x)
                 }).catch((e) => {
                     scope.add("_error", e)
+                    scope.add("_", undefined)
                 })
             }
 
@@ -495,49 +529,4 @@ class History {
         return result
     }
 
-}
-
-
-function makePromptString(app: App) {
-    async function promptString(prompt: string) {
-        return new Promise((resolve, reject) => {
-            try {
-                new PromptModal(app, prompt, [resolve, reject]).open()
-            } catch (e) {
-                reject(e)
-            }
-        })
-    }
-    return promptString
-}
-
-
-class PromptModal extends Modal {
-    constructor(app: App, prompt: string, onSubmit: [resolve: (_: any) => void, reject: (_: any) => void]) {
-        super(app);
-        this.setTitle(prompt);
-        let [resolve, reject] = onSubmit
-
-        let enterDown = false;
-        let result = '';
-        new Setting(this.contentEl)
-            .setName(prompt)
-            .addText((text) => {
-                text.inputEl.addEventListener("keydown", ({ key }) => {
-                    if (key === 'Enter') {
-                        enterDown = true
-                    }
-                })
-                text.inputEl.addEventListener("keyup", ({ key }) => {
-                    if ((key === 'Enter') && enterDown) {
-                        this.close()
-                        resolve(result)
-                        return true
-                    }
-                })
-                text.onChange((value) => {
-                    result = value;
-                });
-            })
-    }
 }
