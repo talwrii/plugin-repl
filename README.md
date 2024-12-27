@@ -39,13 +39,13 @@ Various convenience functions are provided:
 * dir(o:Object) - List the property in an object
 
 ### User interface
-
 * message(s:string) - Print a notificatoin message
 * promptString(prompt: string) - Read a string from a popup
 * fuzzySelect(choices: Array<string>, prompt?: string) - Select from an Array of strings
+* openFile(f:string) - Open a file in the current pane
+* openUrl(url:string) - Open a url
 
 ### Editor commands
-
 * lineNumber() - return the line number of the current line
 * point() - Return the current cursor position
 * mark() - Return the cursor position at the  beginning of the selection
@@ -59,13 +59,12 @@ Various convenience functions are provided:
 * insert(s:string) - Insert a string into the buffer
 
 ### Reading and files
-
 * writeToFile(name, string) - Overwrite the markdown file called name with the given string
 * appendToFile(name, string) - Append to the markdown file called `name` with the given string
 
-### Files
+### Processes
+* runProc([command, arg1, arg2, ...]) - Run a command and return what it writes to standard out. Raise and error on error. See [require('child_process')](https://nodejs.org/api/child_process.html) for more advanced usage.
 
-* openFile(f:string) - Open a file in the current pane
 
 ### Plugins
 * plugin(s:string) - Get the object for a plugin

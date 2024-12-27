@@ -1,6 +1,8 @@
 import { Editor, MarkdownView, Notice, Plugin, EditorPosition, App, Modal, Setting } from 'obsidian';
 
+import { execFileSync } from 'child_process'
 import * as util from 'util'
+import { promisify } from 'util'
 import * as evalScope from "./evalScope"
 import { FuzzySelector } from './fuzzy'
 import { PromptStringModal } from './promptString'
@@ -33,6 +35,11 @@ function makePlugin(app: any) {
         return app.plugins.plugins[name]
     }
     return plugin
+}
+
+function runProc(commandAndArgs: Array<string>) {
+    let [command, ...args] = commandAndArgs
+    return execFileSync(command, args).toString()
 }
 
 
@@ -301,7 +308,7 @@ export default class ReplPlugin extends Plugin {
 
         // @ts-ignore path does exist
         this.scope.add("path", this.app.workspace?.activeLeaf?.view?.path)
-
+        this.scope.add("runProc", runProc)
         this.scope.add("newCommand", this.makeNewCommand())
         this.scope.add("source", this.makeSource(this.app))
         this.scope.add("plugin", makePlugin(this.app))
