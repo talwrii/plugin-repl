@@ -2,18 +2,22 @@ import { Editor, MarkdownView, Notice, Plugin, EditorPosition, App, Modal, Setti
 
 import { execFileSync } from 'child_process'
 import * as util from 'util'
+import { parse as shellParse } from 'shell-quote';
 import { promisify } from 'util'
-import * as evalScope from "./evalScope"
+
+// the convenience functions are the things that change most and should
+// be easiest to discover. Pull core funcitonality out
 import { FuzzySelector } from './fuzzy'
 import { PromptStringModal } from './promptString'
+import { formatObj } from './format'
+import { Scope } from './scope'
+import { History } from './history'
+import { promptCommand } from './promptCommand'
 
+import { Cursor } from './types'
 
 // Remember to rename these classes and interfaces!
 
-type Cursor = {
-    line: number
-    ch: number
-}
 
 interface MyPluginSettings {
     mySetting: string;
@@ -37,11 +41,13 @@ function makePlugin(app: any) {
     return plugin
 }
 
-function runProc(commandAndArgs: Array<string>) {
+function runProc(commandAndArgs: string | Array<string>): string {
+    if (typeof commandAndArgs === "string") {
+        return runProc(shellParse(commandAndArgs))
+    }
     let [command, ...args] = commandAndArgs
     return execFileSync(command, args).toString()
 }
-
 
 function makeFuzzySelect(app: App) {
     function fuzzySelect(choices: Array<string>, prompt?: string) {
@@ -65,30 +71,6 @@ function makePromptString(app: App) {
     }
     return promptString
 }
-
-
-class Scope {
-    // https://stackoverflow.com/questions/2051678/getting-all-variables-in-scope
-    context: Object
-
-    constructor() {
-        this.context = {};
-    }
-
-    add(name: string, x: any) {
-        this.context[name] = x
-    }
-
-    eval(s: string) {
-        return evalScope.evalInScope(s, this.context)
-    }
-
-    run(f: any) {
-        return evalScope.runInScope(f, this.context)
-    }
-}
-
-
 
 function dir(obj: any) {
     let p = [];
@@ -131,8 +113,6 @@ function makeSelection(editor: Editor) {
     return selection
 }
 
-
-
 function makeReadFile(app: any) {
     const readFile = function(name: string) {
         name = name + ".md"
@@ -141,7 +121,6 @@ function makeReadFile(app: any) {
     }
     return readFile
 }
-
 
 function makeWriteToFile(app: any) {
     const writeToFile = function(name: string, text: string) {
@@ -164,7 +143,6 @@ function makeGetDv(app: any) {
     return getDv
 }
 
-
 function makeAppendToFile(app: any) {
     const writeToFile = makeWriteToFile(app)
     const readFile = makeReadFile(app)
@@ -179,8 +157,6 @@ function makeAppendToFile(app: any) {
     return appendToFile
 }
 
-
-
 function makeForwardChar(editor: Editor): (count: number | undefined) => void {
     function forwardChar(count: number | undefined): void {
         if (count === undefined) {
@@ -193,7 +169,6 @@ function makeForwardChar(editor: Editor): (count: number | undefined) => void {
     }
     return forwardChar
 }
-
 
 function makeInsert(editor: Editor): (s: string) => void {
     function insert(s: string) {
@@ -223,14 +198,12 @@ function makeBufferString(editor: Editor): () => string {
     return bufferString
 }
 
-
 function makePoint(editor: Editor) {
     function point(): Cursor {
         return editor.getCursor("to")
     }
     return point
 }
-
 
 function makeMark(editor: Editor) {
     function mark() {
@@ -251,7 +224,6 @@ function makeSaveExcursion(editor: Editor) {
     return saveExcursion
 }
 
-
 function makeLineNumber(editor: Editor): () => number {
     function lineNumber(): number {
         return editor.getCursor().line
@@ -264,37 +236,15 @@ function openUrl(url: string) {
     return undefined
 }
 
-
-const formatObj = (x: any) => {
-    if (x === undefined) {
-        return "undefined"
-    }
-    else if (x === null) {
-        return "null"
-    } else if (typeof x === "string") {
-        return x.toString()
-    } else if (typeof x === "boolean") {
-        return x.toString()
-    } else if (typeof x === "number") {
-        return x.toString()
-    } else if (x.constructor === undefined) {
-        return util.inspect(x)
-    } else if (x.constructor === Array) {
-        return x.toString()
-    } else if (x.constructor === Object) {
-        return util.inspect(x)
-    } else {
-        return `[${x.constructor.name} object]`
-    }
-}
-
-const makeEndOfLine = (editor: any) => {
+function makeEndOfLine(editor: any): (() => void) {
     return () => {
         const cursor = editor.getCursor()
         const line = editor.getLine(cursor.line)
         editor.setCursor(cursor.line, line.length)
     }
 }
+
+
 
 export default class ReplPlugin extends Plugin {
     settings: MyPluginSettings;
@@ -329,6 +279,7 @@ export default class ReplPlugin extends Plugin {
     }
 
     updateScopeEditor(editor: Editor, view: MarkdownView) {
+        this.scope.add("popup", popup.bind(null, this.app, editor))
         this.scope.add("endOfLine", makeEndOfLine(editor))
         this.scope.add("saveExcursion", makeSaveExcursion(editor))
         this.scope.add("lineNumber", makeLineNumber(editor))
@@ -465,77 +416,41 @@ export default class ReplPlugin extends Plugin {
             id: 'repl-prompt-exec',
             name: 'Read some javascript and run it',
             editorCallback: (editor: Editor, view: MarkdownView) => {
-                const before = editor.getCursor()
-                new CommandModal(this.app, this.history, (result) => {
-                    const output = this.runCommand(editor, view, result)
-                    message(output)
-                    editor.setCursor(before)
-                }).open()
+                promptCommand(editor, view)
             }
         });
     }
 }
 
-class CommandModal extends Modal {
-    constructor(app: App, history: History, onSubmit: (result: string) => void) {
-        super(app);
-        this.setTitle('Execute javascript (press return)');
-
-        let enterDown = false;
-        let command = '';
-        new Setting(this.contentEl)
-            .setName('Javascript')
-            .addText((text) => {
-                text.inputEl.addEventListener("keydown", ({ key }) => {
-                    if (key === 'Enter') {
-                        enterDown = true
-                    }
-                })
-                text.inputEl.addEventListener("keyup", ({ key }) => {
-                    if ((key === 'Enter') && enterDown) {
-                        this.close()
-                        history.add(command)
-                        onSubmit(command)
-                        return true
-                    } else if (key === 'ArrowUp') {
-                        command = history.previous()
-                        text.inputEl.value = command
-                    } else if (key === 'ArrowDown') {
-                        command = history.next()
-                        text.inputEl.value = command
-                    }
-                })
-                text.onChange((value) => {
-                    command = value;
-                });
-            })
-    }
+function popup(app: App, editor: Editor, message: string): Promise<void> {
+    const position = editor.getCursor()
+    return new Promise<void>((resolve, reject) => {
+        new Popup(app, message, resolve).open()
+        editor.setCursor(position)
+    })
 }
 
+export class Popup extends Modal {
+    constructor(app: App, msg: string, resolve: () => void) {
+        super(app);
+        this.setContent(msg)
+        new Setting(this.contentEl).addButton((btn) => {
+            btn.setButtonText("OK")
 
-class History {
-    index: number
-    entries: Array<string>
-    constructor() {
-        this.index = 0
-        this.entries = []
+            let keyDown = false;
+
+            btn.buttonEl.addEventListener("keydown", ({ key }) => {
+                keyDown = true
+            })
+
+
+            btn.buttonEl.addEventListener("keyup", ({ key }) => {
+                if (keyDown) {
+                    this.close()
+                    resolve()
+                    return true
+                }
+            })
+        })
     }
-
-    add(s: string): void {
-        this.entries.push(s)
-        this.index = this.entries.length - 1
-    }
-
-    previous() {
-        const result = this.entries[this.index]
-        this.index = Math.max(this.index - 1, 0)
-        return result
-    }
-
-    next() {
-        this.index = Math.min(this.index + 1, this.entries.length - 1)
-        const result = this.entries[this.index]
-        return result
-    }
-
 }

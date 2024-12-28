@@ -64,6 +64,7 @@ Various convenience functions are provided:
 * appendToFile(name, string) - Append to the markdown file called `name` with the given string
 
 ### Processes
+* runProc(s: string) - Parse the bash-style command string s (e.g "ls /home") and call runProc on it
 * runProc([command, arg1, arg2, ...]) - Run a command and return what it writes to standard out. Raise and error on error. See [require('child_process')](https://nodejs.org/api/child_process.html) for more advanced usage.
 
 
