@@ -435,7 +435,12 @@ function popup(app: App, editor: Editor, message: string): Promise<void> {
 export class Popup extends Modal {
     constructor(app: App, msg: string, resolve: () => void) {
         super(app);
-        this.setContent(msg)
+
+        let el = new DocumentFragment()
+        let pre = el.createEl("pre")
+        pre.appendText(msg)
+
+        this.setContent(el)
         new Setting(this.contentEl).addButton((btn) => {
             btn.setButtonText("OK")
 
