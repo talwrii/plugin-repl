@@ -40,11 +40,13 @@ Various convenience functions are provided:
 * dir(o:Object) - List the property in an object
 
 ### User interface
-* message(s:string) - Print a notificatoin message
+* message(s:string) - Print a notification message to the corner of the screen
+* popup(s: string) - Popup a dialog displaying a message
 * promptString(prompt: string) - Read a string from a popup
 * fuzzySelect(choices: Array<string>, prompt?: string) - Select from an Array of strings
 * openFile(f:string) - Open a file in the current pane
 * openUrl(url:string) - Open a url
+
 
 ### Editor commands
 * lineNumber() - return the line number of the current line
