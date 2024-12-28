@@ -2,13 +2,12 @@ import { Editor, MarkdownView, Notice, App, Modal, Setting } from 'obsidian';
 
 import { History } from './history'
 
-export function promptCommand(editor: Editor, view: MarkdownView) {
-    const before = editor.getCursor()
-    new CommandModal(this.app, this.history, (result) => {
-        const output = this.runCommand(editor, view, result)
-        editor.setCursor(before)
-    }).open()
-
+export function promptCommand(app: App, history: History, editor: Editor): Promise<string> {
+    return new Promise((resolve, reject) => {
+        new CommandModal(app, history, (result) => {
+            resolve(result)
+        }).open()
+    })
 }
 
 class CommandModal extends Modal {

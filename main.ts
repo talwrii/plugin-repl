@@ -415,8 +415,10 @@ export default class ReplPlugin extends Plugin {
         this.addCommand({
             id: 'repl-prompt-exec',
             name: 'Read some javascript and run it',
-            editorCallback: (editor: Editor, view: MarkdownView) => {
-                promptCommand(editor, view)
+            editorCallback: async (editor: Editor, view: MarkdownView) => {
+                let command = await promptCommand(this.app, this.history, editor)
+                message(command)
+                message(this.runCommand(editor, view, command))
             }
         });
     }
