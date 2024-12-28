@@ -123,7 +123,7 @@ The approach I have used to getting access to modules when hacking on a new plug
 
 ## Alternatives and prior work
 * You can [use plugins](https://docs.obsidian.md/Plugins/Getting+started/Build+a+plugin) to do the same things that you can do with plugin-repl but this tends to mean more code.
-* [js-engine](https://github.com/mProjectsCode/obsidian-js-engine-plugin) lets you evaulate javascript code in code blocks. But does not give you access to obsidian objects to control obsidiate
+* [js-engine](https://github.com/mProjectsCode/obsidian-js-engine-plugin) lets you evaulate javascript code in code blocks. [Execute code](https://github.com/twibiral/obsidian-execute-code) gives you code blocks in multiple languages. Neither give you access to obsidian objects to control obsidiate
 * [dataview](https://blacksmithgu.github.io/obsidian-dataview/) similarly lets you execute javascript in box and gives you access to the app object.
 
 
