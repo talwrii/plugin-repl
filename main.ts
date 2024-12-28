@@ -308,6 +308,8 @@ export default class ReplPlugin extends Plugin {
 
         // @ts-ignore path does exist
         this.scope.add("path", this.app.workspace?.activeLeaf?.view?.path)
+        //@ts-ignore
+        this.scope.add("vaultPath", this.app.vault.adapter.basePath)
         this.scope.add("runProc", runProc)
         this.scope.add("newCommand", this.makeNewCommand())
         this.scope.add("source", this.makeSource(this.app))

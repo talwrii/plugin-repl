@@ -27,6 +27,7 @@ A "dir" method is provided to allow you to inspect objects. And various useful o
 * `editor` is the editor object. You can use this to write to current-file
 * `app` is the application object.
 * `path` is the path of the current note
+* `vaultPath` is the absolute path of the current vault
 
 You might like to [refer to the plugin documentation](https://docs.obsidian.md/Plugins/Getting+started/Build+a+plugin) at the same time.
 
