@@ -38,6 +38,7 @@ Various convenience functions are provided:
 * command(s:string) - Run a command
 * makeNewCommand(new_name) - Create a new command with name "new name" which runs the function new_name
 * dir(o:Object) - List the property in an object
+* fuzzyDir(o: Object) - Explore the properties of an object with a fuzzy selector
 
 ### User interface
 * message(s:string) - Print a notification message to the corner of the screen
@@ -46,6 +47,10 @@ Various convenience functions are provided:
 * fuzzySelect(choices: Array<string>, prompt?: string) - Select from an Array of strings
 * openFile(f:string) - Open a file in the current pane
 * openUrl(url:string) - Open a url
+
+
+### Settings
+openSetting(name: string) - Open settings and display the tab (see left hand side) with the given name.
 
 
 ### Editor commands
@@ -60,6 +65,9 @@ Various convenience functions are provided:
 * bufferString() - Return a string containing the entire text of the buffer
 * bufferString(start, end) - Return the string between these two cursor positions (editor.getCursor())
 * insert(s:string) - Insert a string into the buffer
+
+* wordAtPoint(p?:string) - Returns the word at the cursor position. Default to current postion.
+* lineAtPoint(p?:string) - Retunrs the line at the cursor position. Default to current positiong.
 
 ### Reading and files
 * writeToFile(name, string) - Overwrite the markdown file called name with the given string

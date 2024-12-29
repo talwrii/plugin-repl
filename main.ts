@@ -1,9 +1,10 @@
-import { Editor, MarkdownView, Notice, Plugin, EditorPosition, App, Modal, Setting } from 'obsidian';
+import { Editor, MarkdownView, Notice, Plugin, EditorPosition, App, Modal, Setting, } from 'obsidian';
 
 import { execFileSync } from 'child_process'
 import * as util from 'util'
 import { parse as shellParse } from 'shell-quote';
 import { promisify } from 'util'
+import { expandRegionWithRegexp } from './editorUtils'
 
 // the convenience functions are the things that change most and should
 // be easiest to discover. Pull core funcitonality out
@@ -49,14 +50,11 @@ function runProc(commandAndArgs: string | Array<string>): string {
     return execFileSync(command, args).toString()
 }
 
-function makeFuzzySelect(app: App) {
-    function fuzzySelect(choices: Array<string>, prompt?: string) {
-        return new Promise((reject, resolve) => {
-            let selector = new FuzzySelector(app, prompt || "select:", choices, [reject, resolve])
-            selector.run()
-        })
-    }
-    return fuzzySelect
+function fuzzySelect(app: App, choices: Array<string>, prompt?: string) {
+    return new Promise((reject, resolve) => {
+        let selector = new FuzzySelector(app, prompt || "select:", choices, [reject, resolve])
+        selector.run()
+    })
 }
 
 function makePromptString(app: App) {
@@ -81,6 +79,10 @@ function dir(obj: any) {
                 p.push(op[i]);
     }
     return p;
+}
+
+function fuzzyDir(app: App, obj: any) {
+    return fuzzySelect(app, dir(obj))
 }
 
 function message(s: string) {
@@ -255,11 +257,13 @@ export default class ReplPlugin extends Plugin {
     updateScopeApp() {
         this.scope.add("repl", this)
         this.scope.add("dir", dir)
+        this.scope.add("fuzzyDir", fuzzyDir.bind(null, this.app))
 
         // @ts-ignore path does exist
         this.scope.add("path", this.app.workspace?.activeLeaf?.view?.path)
         //@ts-ignore
         this.scope.add("vaultPath", this.app.vault.adapter.basePath)
+        this.scope.add("openSetting", openSetting.bind(null, this.app))
         this.scope.add("runProc", runProc)
         this.scope.add("newCommand", this.makeNewCommand())
         this.scope.add("source", this.makeSource(this.app))
@@ -274,7 +278,7 @@ export default class ReplPlugin extends Plugin {
         this.scope.add("message", message)
         this.scope.add("workspace", this.app.workspace)
         this.scope.add("openFile", makeOpenFile(this.app))
-        this.scope.add("fuzzySelect", makeFuzzySelect(this.app))
+        this.scope.add("fuzzySelect", fuzzySelect.bind(null, this.app))
         this.scope.add("openUrl", openUrl)
     }
 
@@ -283,11 +287,12 @@ export default class ReplPlugin extends Plugin {
         this.scope.add("endOfLine", makeEndOfLine(editor))
         this.scope.add("saveExcursion", makeSaveExcursion(editor))
         this.scope.add("lineNumber", makeLineNumber(editor))
-        this.scope.add("lineAtPoint", makeLineAtPoint(editor))
         this.scope.add("bufferString", makeBufferString(editor))
         this.scope.add("point", makePoint(editor))
         this.scope.add("mark", makeMark(editor))
         this.scope.add("insert", makeInsert(editor))
+        this.scope.add("lineAtPoint", makeLineAtPoint(editor))
+        this.scope.add("wordAtPoint", wordAtPoint.bind(null, editor))
         this.scope.add("pointMin", pointMin)
         this.scope.add("pointMax", makePointMax(editor))
         this.scope.add("selection", makeSelection(editor))
@@ -417,7 +422,6 @@ export default class ReplPlugin extends Plugin {
             name: 'Read some javascript and run it',
             editorCallback: async (editor: Editor, view: MarkdownView) => {
                 let command = await promptCommand(this.app, this.history, editor)
-                message(command)
                 message(this.runCommand(editor, view, command))
             }
         });
@@ -444,20 +448,63 @@ export class Popup extends Modal {
         new Setting(this.contentEl).addButton((btn) => {
             btn.setButtonText("OK")
 
+            let popup = this
+
             let keyDown = false;
+            function done() {
+                popup.close()
+                resolve()
+                return true
+            }
 
             btn.buttonEl.addEventListener("keydown", ({ key }) => {
                 keyDown = true
             })
 
+            btn.buttonEl.addEventListener('click', (event) => {
+                return done()
+            })
 
             btn.buttonEl.addEventListener("keyup", ({ key }) => {
                 if (keyDown) {
-                    this.close()
-                    resolve()
-                    return true
+                    return done()
                 }
             })
         })
     }
+}
+
+
+function wordAtPoint(editor: Editor) {
+    const pos = editor.getCursor()
+    const [start, end] = expandRegionWithRegexp(editor, /\w/, pos, { ...pos, ch: pos.ch + 1 })
+    const line = editor.getLine(pos.line)
+    return line.slice(start.ch, end.ch)
+}
+
+async function openSetting(app: any, name: string) {
+    function findTab(app: any, name: string): any {
+        var result = undefined;
+
+        app.setting.settingTabs.forEach((tab: any) => {
+            if (tab.name === name) {
+                result = tab
+            }
+        })
+
+        app.setting.pluginTabs.forEach((tab: any) => {
+            if (tab.name === name) {
+                result = tab
+            }
+        })
+
+        if (result === undefined) {
+            throw new Error("Could not find tab with name:" + name)
+        }
+        return result
+    }
+
+
+    await app.setting.open()
+    await app.setting.openTabById(findTab(app, name).id)
 }
