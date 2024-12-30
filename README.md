@@ -132,6 +132,9 @@ I experimented with the [obsidian modules](https://github.com/polyipseity/obsidi
 
 The approach I have used to getting access to modules when hacking on a new plugin is to create a new plugin and half that plugin set `self.MODULE = MODULE` on load. You can then access this self open from the repl.
 
+## Some questions and answers about plugin repl
+[Questions and answers](questions.md)
+
 ## Alternatives and prior work
 * You can [use plugins](https://docs.obsidian.md/Plugins/Getting+started/Build+a+plugin) to do the same things that you can do with plugin-repl but this tends to mean more code.
 * [js-engine](https://github.com/mProjectsCode/obsidian-js-engine-plugin) lets you evaulate javascript code in code blocks. [Execute code](https://github.com/twibiral/obsidian-execute-code) gives you code blocks in multiple languages. Neither give you access to obsidian objects to control obsidiate
