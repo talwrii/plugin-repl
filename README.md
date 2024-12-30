@@ -1,6 +1,7 @@
 # Plugin repl - A read evaluate print loop for Obsidian
 This plugin adds an emacs-like read evaluate print loop (REPL) to Obsidian.
 This lets you execute javascript directly in a document *and*, importantly, interact with Obsidian's plugin api to make Obsidian do things (like move the cursor, insert text, open files, etc).
+You can also define new commands in javascript.
 
 This can be useful when developing plugins, or for "light-weight" scripting without having to develop a full plugin yourself.
 
@@ -20,21 +21,23 @@ npm run dev
 
 You should then be able to enable the plugin in the "Community Plugins" section of settings.
 
-# Using
-Install the plugin. I would advise binding CTRL-J to the commamd (Execute the current line or selection).
+## Using
+I would advise binding CTRL-J to the commamd: "Execute the current line or selection".
 
 You can then write javascript expressions and then run commands to execute these expressions, return the result.
-A "dir" method is provided to allow you to inspect objects. And various useful objects are available.
+To define a command use the [newCommand](#commands) function.
 
-* `repl` is the plugin object for repl.
-* `editor` is the editor object. You can use this to write to current-file
-* `app` is the application object.
-* `path` is the path of the current note
-* `vaultPath` is the absolute path of the current vault
+For a lot of uses, the [convenience funcitons](#convenience) may well provide all the functional need.
+But plugin repl also gives you access to much of [Obsidian's plugin API](https://docs.obsidian.md/Plugins/Getting+started/Build+a+plugin) 
+through the `app`, `editor` and `repl` (plugin) objects.
 
-You might like to [refer to the plugin documentation](https://docs.obsidian.md/Plugins/Getting+started/Build+a+plugin) at the same time.
+The `dir` and `fuzzyDir` methods can help explore these objects allong with the [API documentation](https://docs.obsidian.md/Plugins/Getting+started/Build+a+plugin).
+
+## Documentation
+This page provides an overview of functionality you might like to look at the [Obsidian and Plugin Repl Cookbook](https://readwithai.substack.com/p/obsidian-plugin-repl-cookbook) that provides various examples of how plugin repl can be used.
 
 ## Convenience functions provided
+<a name="convenience" />
 Various convenience functions are provided:
 
 * source(f:string) - Open the markdown file called f and execute the code in it
@@ -51,12 +54,12 @@ Various convenience functions are provided:
 * openFile(f:string) - Open a file in the current pane
 * openUrl(url:string) - Open a url
 
-
 ### Settings
-openSetting(name: string) - Open settings and display the tab (see left hand side) with the given name.
-
+* openSetting(name: string) - Open settings and display the tab (see left hand side) with the given name.
+* `vaultPath` is the absolute path of the current vault
 
 ### Editor commands
+* `path` is the path of the current note
 * lineNumber() - return the line number of the current line
 * point() - Return the current cursor position
 * mark() - Return the cursor position at the  beginning of the selection
@@ -80,10 +83,15 @@ openSetting(name: string) - Open settings and display the tab (see left hand sid
 * runProc(s: string) - Parse the bash-style command string s (e.g "ls /home") and call runProc on it
 * runProc([command, arg1, arg2, ...]) - Run a command and return what it writes to standard out. Raise and error on error. See [require('child_process')](https://nodejs.org/api/child_process.html) for more advanced usage.
 
-
 ### Plugins
-* plugin(s:string) - Get the object for a plugin
+* plugin(s:string) - Get the object for a plugin. You may be able to reuse features from another plugin with this.
 * getDv() - Get the dataview object
+
+### API access
+* `repl` is the plugin object for repl.
+* `editor` is the editor object. You can use this to write to current-file
+* `app` is the application object.
+
 
 ## Defining commands
 <a name="commands"></a>
