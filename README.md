@@ -9,6 +9,8 @@ This can be useful when developing plugins, or for "light-weight" scripting with
 
 A range of convenience functions partly inspired by emacs is also provided.
 
+*I am in no way affiliated with Obsidian. This is a third party plugin.*
+
 # Demo
 ![demo](demo.gif)
 
