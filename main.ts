@@ -1,9 +1,7 @@
 import { Editor, MarkdownView, Notice, Plugin, EditorPosition, App, Modal, Setting, } from 'obsidian';
 
 import { execFileSync } from 'child_process'
-import * as util from 'util'
 import { parse as shellParse } from 'shell-quote';
-import { promisify } from 'util'
 import { expandRegionWithRegexp } from './editorUtils'
 
 // the convenience functions are the things that change most and should
@@ -15,8 +13,6 @@ import { Scope } from './scope'
 import { History } from './history'
 import { promptCommand } from './promptCommand'
 
-import { Cursor } from './types'
-
 // Remember to rename these classes and interfaces!
 
 
@@ -24,27 +20,19 @@ interface MyPluginSettings {
     mySetting: string;
 }
 
-const DEFAULT_SETTINGS: MyPluginSettings = {
-    mySetting: 'default'
+
+function openFile(app: any, name: string) {
+    app.workspace.openLinkText(name)
 }
 
-function makeOpenFile(app: any) {
-    function openFile(name: string) {
-        app.workspace.openLinkText(name)
-    }
-    return openFile
-}
-
-function makePlugin(app: any) {
-    function plugin(name: string) {
-        return app.plugins.plugins[name]
-    }
-    return plugin
+function plugin(app: any, name: string) {
+    return app.plugins.plugins[name]
 }
 
 function runProc(commandAndArgs: string | Array<string>): string {
     if (typeof commandAndArgs === "string") {
-        return runProc(shellParse(commandAndArgs))
+        let command = shellParse(commandAndArgs) as string[]
+        return runProc(command)
     }
     let [command, ...args] = commandAndArgs
     return execFileSync(command, args).toString()
@@ -57,17 +45,14 @@ function fuzzySelect(app: App, choices: Array<string>, prompt?: string) {
     })
 }
 
-function makePromptString(app: App) {
-    async function promptString(prompt: string) {
-        return new Promise((resolve, reject) => {
-            try {
-                new PromptStringModal(app, prompt, [resolve, reject]).open()
-            } catch (e) {
-                reject(e)
-            }
-        })
-    }
-    return promptString
+async function promptString(app: App, prompt: string) {
+    return new Promise((resolve, reject) => {
+        try {
+            new PromptStringModal(app, prompt, [resolve, reject]).open()
+        } catch (e) {
+            reject(e)
+        }
+    })
 }
 
 function dir(obj: any) {
@@ -90,147 +75,113 @@ function message(s: string) {
 }
 
 
-function makeCommand(app: any) {
-    function command(id: string) {
-        app.commands.executeCommandById(id)
-    }
-    return command
+function command(app: any, id: string) {
+    app.commands.executeCommandById(id)
 }
 
-function makeLineAtPoint(editor: Editor) {
-    function lineAtPoint() {
-        return editor.getLine(editor.getCursor().line)
-    }
-    return lineAtPoint
+function lineAtPoint(editor: Editor) {
+    return editor.getLine(editor.getCursor().line)
 }
 
-function makeSelection(editor: Editor) {
-    function selection() {
-        let selection = editor.getSelection()
-        if (selection === "") {
-            throw Error("No text is selected")
-        }
-        return selection
+function selection(editor: Editor) {
+    let selection = editor.getSelection()
+    if (selection === "") {
+        throw Error("No text is selected")
     }
     return selection
 }
 
-function makeReadFile(app: any) {
-    const readFile = function(name: string) {
-        name = name + ".md"
-        const file = app.vault.getAbstractFileByPath(name)
-        return app.vault.read(file)
-    }
-    return readFile
+const readFile = function(app: any, name: string) {
+    name = name + ".md"
+    const file = app.vault.getAbstractFileByPath(name)
+    return app.vault.read(file)
 }
 
-function makeWriteToFile(app: any) {
-    const writeToFile = function(name: string, text: string) {
-        name = name + ".md"
-        const file = app.vault.getAbstractFileByPath(name)
-        return app.vault.modify(file, text)
-    }
-    return writeToFile
+const writeFile = function(app: any, name: string, text: string) {
+    name = name + ".md"
+    const file = app.vault.getAbstractFileByPath(name)
+    return app.vault.modify(file, text)
 }
 
-function makeGetDv(app: any) {
-    function getDv() {
-        let plugin = makePlugin(app)
-        let p = plugin("dataview")
-        if (p === undefined) {
-            throw new Error("dataview plugin is missing. Is it installed?")
-        }
-        return p.localApi()
+function getDv(app: App) {
+    let p = plugin(app, "dataview")
+    if (p === undefined) {
+        throw new Error("dataview plugin is missing. Is it installed?")
     }
-    return getDv
+    return p.localApi()
 }
 
-function makeAppendToFile(app: any) {
-    const writeToFile = makeWriteToFile(app)
-    const readFile = makeReadFile(app)
-    async function appendToFile(name: string, appended: string) {
-        let existing = await readFile(name)
-        if (existing === undefined) {
-            existing = ""
-        }
-        const content = existing + appended
-        await writeToFile(name, content)
+async function appendToFile(app: App, name: string, appended: string) {
+    let existing = await readFile(app, name)
+    if (existing === undefined) {
+        existing = ""
     }
-    return appendToFile
+    const content = existing + appended
+    await writeFile(app, name, content)
 }
 
-function makeForwardChar(editor: Editor): (count: number | undefined) => void {
-    function forwardChar(count: number | undefined): void {
-        if (count === undefined) {
-            count = 1
-        }
-
-        let cursor = editor.getCursor()
-        cursor.ch += count
-        editor.setCursor(cursor)
+function forwardChar(editor: Editor, count: number | undefined): void {
+    if (count === undefined) {
+        count = 1
     }
-    return forwardChar
+
+    let cursor = editor.getCursor()
+    cursor.ch += count
+    editor.setCursor(cursor)
 }
 
-function makeInsert(editor: Editor): (s: string) => void {
-    function insert(s: string) {
-        editor.replaceRange(s, editor.getCursor())
-        makeForwardChar(editor)(s.length)
-    }
-    return insert
+function insert(editor: Editor, s: string) {
+    editor.replaceRange(s, editor.getCursor())
+    forwardChar(editor, s.length)
 }
 
-function makePointMax(editor: Editor): () => EditorPosition {
-    function pointMax() {
-        const lastLine = editor.lastLine()
-        const lastChar = editor.getLine(lastLine).length
-        return { line: lastLine, ch: lastChar }
+function cmpCursor(a: EditorPosition, b: EditorPosition) {
+    if (a.line < b.line) {
+        return -1
+    } else if (b.line < a.line) {
+        return 1
+    } else if (a.ch < b.ch) {
+        return -1
+    } else if (b.ch < a.ch) {
+        return 1
+    } else {
+        return 0
     }
-    return pointMax
 }
 
-function pointMin(): Cursor {
+function kill(editor: Editor, pos1?: EditorPosition, pos2?: EditorPosition) {
+    pos1 = pos1 || mark(editor)
+    pos2 = pos2 || point(editor)
+
+    let [a, b] = [pos1, pos2].sort(cmpCursor)
+    editor.replaceRange("", a, b)
+}
+
+function pointMax(editor: Editor) {
+    const lastLine = editor.lastLine()
+    const lastChar = editor.getLine(lastLine).length
+    return { line: lastLine, ch: lastChar }
+}
+
+function pointMin(): EditorPosition {
     return { line: 0, ch: 0 }
 }
 
-function makeBufferString(editor: Editor): () => string {
-    function bufferString(start?: Cursor, end?: Cursor) {
-        return editor.getRange(start || pointMin(), end || makePointMax(editor)())
-    }
-    return bufferString
+function bufferString(editor: Editor, start?: EditorPosition, end?: EditorPosition) {
+    return editor.getRange(start || pointMin(), end || pointMax(editor))
 }
 
-function makePoint(editor: Editor) {
-    function point(): Cursor {
-        return editor.getCursor("to")
-    }
-    return point
+function point(editor: Editor): EditorPosition {
+    return editor.getCursor("to")
 }
 
-function makeMark(editor: Editor) {
-    function mark() {
-        return editor.getCursor("from")
-    }
-    return mark
+function mark(editor: Editor) {
+    return editor.getCursor("from")
 }
 
-function makeSaveExcursion(editor: Editor) {
-    function saveExcursion(f: () => any): void {
-        const point = editor.getCursor()
-        try {
-            return f()
-        } finally {
-            editor.setCursor(point)
-        }
-    }
-    return saveExcursion
-}
 
-function makeLineNumber(editor: Editor): () => number {
-    function lineNumber(): number {
-        return editor.getCursor().line
-    }
-    return lineNumber
+function lineNumber(editor: Editor): number {
+    return editor.getCursor().line
 }
 
 function openUrl(url: string) {
@@ -238,12 +189,10 @@ function openUrl(url: string) {
     return undefined
 }
 
-function makeEndOfLine(editor: any): (() => void) {
-    return () => {
-        const cursor = editor.getCursor()
-        const line = editor.getLine(cursor.line)
-        editor.setCursor(cursor.line, line.length)
-    }
+function endOfLine(editor: any) {
+    const cursor = editor.getCursor()
+    const line = editor.getLine(cursor.line)
+    editor.setCursor(cursor.line, line.length)
 }
 
 
@@ -256,47 +205,47 @@ export default class ReplPlugin extends Plugin {
 
     updateScopeApp() {
         this.scope.add("repl", this)
+        // @ts-ignore path does exist
+        this.scope.add("path", this.app.workspace.getLeaf().view.path)
+
         this.scope.add("dir", dir)
         this.scope.add("fuzzyDir", fuzzyDir.bind(null, this.app))
 
-        // @ts-ignore path does exist
-        this.scope.add("path", this.app.workspace?.activeLeaf?.view?.path)
         //@ts-ignore
         this.scope.add("vaultPath", this.app.vault.adapter.basePath)
         this.scope.add("openSetting", openSetting.bind(null, this.app))
         this.scope.add("runProc", runProc)
         this.scope.add("newCommand", this.makeNewCommand())
         this.scope.add("source", this.makeSource(this.app))
-        this.scope.add("plugin", makePlugin(this.app))
-        this.scope.add("promptString", makePromptString(this.app))
-        this.scope.add("command", makeCommand(this.app))
-        this.scope.add("readFile", makeReadFile(this.app))
-        this.scope.add("writeToFile", makeWriteToFile(this.app))
-        this.scope.add("getDv", makeGetDv(this.app))
-        this.scope.add("appendToFile", makeAppendToFile(this.app))
-        this.scope.add("app", this.app)
+        this.scope.add("plugin", plugin.bind(null, this.app))
+        this.scope.add("promptString", promptString.bind(null, this.app))
+        this.scope.add("command", command.bind(null, this.app))
+        this.scope.add("readFile", readFile.bind(null, this.app))
+        this.scope.add("writeFile", writeFile.bind(null, this.app))
+        this.scope.add("appendToFile", appendToFile.bind(null, this.app))
+
+        this.scope.add("getDv", getDv.bind(null, this.app))
         this.scope.add("message", message)
-        this.scope.add("workspace", this.app.workspace)
-        this.scope.add("openFile", makeOpenFile(this.app))
+        this.scope.add("openFile", openFile.bind(null, this.app))
         this.scope.add("fuzzySelect", fuzzySelect.bind(null, this.app))
         this.scope.add("openUrl", openUrl)
     }
 
     updateScopeEditor(editor: Editor, view: MarkdownView) {
         this.scope.add("popup", popup.bind(null, this.app, editor))
-        this.scope.add("endOfLine", makeEndOfLine(editor))
-        this.scope.add("saveExcursion", makeSaveExcursion(editor))
-        this.scope.add("lineNumber", makeLineNumber(editor))
-        this.scope.add("bufferString", makeBufferString(editor))
-        this.scope.add("point", makePoint(editor))
-        this.scope.add("mark", makeMark(editor))
-        this.scope.add("insert", makeInsert(editor))
-        this.scope.add("lineAtPoint", makeLineAtPoint(editor))
+        this.scope.add("endOfLine", endOfLine.bind(null, editor))
+        this.scope.add("lineNumber", lineNumber.bind(null, editor))
+        this.scope.add("bufferString", bufferString.bind(null, editor))
+        this.scope.add("point", point.bind(null, editor))
+        this.scope.add("mark", mark.bind(null, editor))
+        this.scope.add("insert", insert.bind(null, editor))
+        this.scope.add("kill", kill.bind(null, editor))
+        this.scope.add("lineAtPoint", lineAtPoint.bind(null, editor))
         this.scope.add("wordAtPoint", wordAtPoint.bind(null, editor))
         this.scope.add("pointMin", pointMin)
-        this.scope.add("pointMax", makePointMax(editor))
-        this.scope.add("selection", makeSelection(editor))
-        this.scope.add("forwardChar", makeForwardChar(editor))
+        this.scope.add("pointMax", pointMax.bind(null, editor))
+        this.scope.add("selection", selection.bind(null, editor))
+        this.scope.add("forwardChar", forwardChar.bind(null, editor))
         this.scope.add("editor", editor)
         this.scope.add("view", view)
     }
@@ -372,6 +321,7 @@ export default class ReplPlugin extends Plugin {
 
     async loadInit() {
         if (!this.initLoaded) {
+            //@ts-ignore -- exists is missing
             let exists = await this.app.vault.exists("repl.md")
             let source = this.makeSource(this.app)
             if (exists) {
@@ -390,8 +340,6 @@ export default class ReplPlugin extends Plugin {
                     const cursor = editor.getCursor()
                     const region = editor.getSelection() || editor.getLine(cursor.line)
 
-                    const endOfLine = makeEndOfLine(editor)
-
                     const output = this.runCommand(editor, view, region)
 
                     if (editor.getCursor().line == editor.lastLine()) {
@@ -400,7 +348,7 @@ export default class ReplPlugin extends Plugin {
 
                     editor.setCursor(cursor.line + 1, 0)
                     editor.replaceRange(output + "\n", editor.getCursor())
-                    endOfLine()
+                    endOfLine(editor)
                 } catch (e) {
                     message(e.message)
                 }
@@ -431,8 +379,12 @@ export default class ReplPlugin extends Plugin {
 function popup(app: App, editor: Editor, message: string): Promise<void> {
     const position = editor.getCursor()
     return new Promise<void>((resolve, reject) => {
-        new Popup(app, message, resolve).open()
-        editor.setCursor(position)
+        try {
+            new Popup(app, message, resolve).open()
+            editor.setCursor(position)
+        } catch (e) {
+            reject(e)
+        }
     })
 }
 
@@ -457,15 +409,15 @@ export class Popup extends Modal {
                 return true
             }
 
-            btn.buttonEl.addEventListener("keydown", ({ key }) => {
+            btn.buttonEl.addEventListener("keydown", (_) => {
                 keyDown = true
             })
 
-            btn.buttonEl.addEventListener('click', (event) => {
+            btn.buttonEl.addEventListener('click', (_) => {
                 return done()
             })
 
-            btn.buttonEl.addEventListener("keyup", ({ key }) => {
+            btn.buttonEl.addEventListener("keyup", (_) => {
                 if (keyDown) {
                     return done()
                 }
@@ -503,7 +455,6 @@ async function openSetting(app: any, name: string) {
         }
         return result
     }
-
 
     await app.setting.open()
     await app.setting.openTabById(findTab(app, name).id)

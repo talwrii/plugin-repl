@@ -1,7 +1,6 @@
-import { Editor } from 'obsidian';
-import { Cursor } from './types'
+import { Editor, EditorPosition } from 'obsidian';
 
-export function expandRegionWithRegexp(editor: Editor, regexp: RegExp, start: Cursor, end: Cursor) {
+export function expandRegionWithRegexp(editor: Editor, regexp: RegExp, start: EditorPosition, end: EditorPosition) {
     if (start.line != end.line) {
         throw new Error("start and end must match")
     }
