@@ -1,5 +1,14 @@
 import { FuzzySuggestModal, App } from 'obsidian';
 
+
+export function fuzzySelect(app: App, choices: Array<string>, prompt?: string) {
+    // doc: fuzzily select from a list of strings
+    return new Promise((reject, resolve) => {
+        let selector = new FuzzySelector(app, prompt || "select:", choices, [reject, resolve])
+        selector.run()
+    })
+}
+
 export class FuzzySelector extends FuzzySuggestModal<string> {
     resolve: (_: any) => void
     reject: (_: any) => void

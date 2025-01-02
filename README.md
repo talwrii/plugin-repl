@@ -6,6 +6,9 @@ This can be useful when developing plugins, or for "light-weight" scripting with
 
 A range of convenience functions partly inspired by emacs is also provided.
 
+# Demo
+![demo](demo.gif)
+
 # Installation
 In your obsidian vault there should be a `.obsidian/plugins` directory. You can clone this repo into that
 directory and then run the following to build the plugin:
@@ -70,8 +73,8 @@ openSetting(name: string) - Open settings and display the tab (see left hand sid
 * lineAtPoint(p?:string) - Retunrs the line at the cursor position. Default to current positiong.
 
 ### Reading and files
-* writeToFile(name, string) - Overwrite the markdown file called name with the given string
-* appendToFile(name, string) - Append to the markdown file called `name` with the given string
+* writeToFile(name: string) - Overwrite the markdown file called name with the given string
+* appendToFile(name: string) - Append to the markdown file called `name` with the given string
 
 ### Processes
 * runProc(s: string) - Parse the bash-style command string s (e.g "ls /home") and call runProc on it
