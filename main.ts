@@ -1,4 +1,4 @@
-import { Editor, MarkdownView, Notice, Plugin, EditorPosition, App, Modal, Setting, } from 'obsidian';
+import { Editor, MarkdownView, Notice, Plugin, EditorPosition, App, Modal, Setting, TFile } from 'obsidian';
 
 import { execFileSync } from 'child_process'
 import { parse as shellParse } from 'shell-quote';
@@ -31,10 +31,10 @@ function plugin(app: any, name: string) {
 
 function runProc(commandAndArgs: string | Array<string>): string {
     if (typeof commandAndArgs === "string") {
-        let command = shellParse(commandAndArgs) as string[]
+        const command = shellParse(commandAndArgs) as string[]
         return runProc(command)
     }
-    let [command, ...args] = commandAndArgs
+    const [command, ...args] = commandAndArgs
     return execFileSync(command, args).toString()
 }
 
@@ -56,7 +56,7 @@ async function promptString(app: App, prompt: string) {
 }
 
 function dir(obj: any) {
-    let p = [];
+    const p = [];
     for (; obj != null; obj = Object.getPrototypeOf(obj)) {
         const op = Object.getOwnPropertyNames(obj);
         for (let i = 0; i < op.length; i++)
@@ -84,7 +84,7 @@ function lineAtPoint(editor: Editor) {
 }
 
 function selection(editor: Editor) {
-    let selection = editor.getSelection()
+    const selection = editor.getSelection()
     if (selection === "") {
         throw Error("No text is selected")
     }
@@ -97,14 +97,19 @@ const readFile = function(app: any, name: string) {
     return app.vault.read(file)
 }
 
-const writeFile = function(app: any, name: string, text: string) {
+const writeFile = async function(app: any, name: string, text: string) {
     name = name + ".md"
-    const file = app.vault.getAbstractFileByPath(name)
-    return app.vault.modify(file, text)
+    let file: TFile
+    if (await app.vault.exists(name)) {
+        file = await app.vault.getAbstractFileByPath(name)
+    } else {
+        file = await app.vault.create(name, "")
+    }
+    return await app.vault.process(file, (_: string) => text)
 }
 
 function getDv(app: App) {
-    let p = plugin(app, "dataview")
+    const p = plugin(app, "dataview")
     if (p === undefined) {
         throw new Error("dataview plugin is missing. Is it installed?")
     }
@@ -125,7 +130,7 @@ function forwardChar(editor: Editor, count: number | undefined): void {
         count = 1
     }
 
-    let cursor = editor.getCursor()
+    const cursor = editor.getCursor()
     cursor.ch += count
     editor.setCursor(cursor)
 }
@@ -153,7 +158,7 @@ function kill(editor: Editor, pos1?: EditorPosition, pos2?: EditorPosition) {
     pos1 = pos1 || mark(editor)
     pos2 = pos2 || point(editor)
 
-    let [a, b] = [pos1, pos2].sort(cmpCursor)
+    const [a, b] = [pos1, pos2].sort(cmpCursor)
     editor.replaceRange("", a, b)
 }
 
@@ -252,7 +257,7 @@ export default class ReplPlugin extends Plugin {
 
 
     makeNewCommand() {
-        let plugin = this
+        const plugin = this
         function newCommand(f: any) {
             plugin.addCommand({
                 id: f.name,
@@ -311,7 +316,7 @@ export default class ReplPlugin extends Plugin {
         const plugin = this
         async function source(name: string) {
             plugin.updateScopeApp()
-            let path = name + ".md"
+            const path = name + ".md"
             const file: string = await app.vault.getAbstractFileByPath(path)
             const contents = await app.vault.read(file)
             plugin.scope.eval(contents)
@@ -322,8 +327,8 @@ export default class ReplPlugin extends Plugin {
     async loadInit() {
         if (!this.initLoaded) {
             //@ts-ignore -- exists is missing
-            let exists = await this.app.vault.exists("repl.md")
-            let source = this.makeSource(this.app)
+            const exists = await this.app.vault.exists("repl.md")
+            const source = this.makeSource(this.app)
             if (exists) {
                 source("repl")
             }
@@ -369,7 +374,7 @@ export default class ReplPlugin extends Plugin {
             id: 'repl-prompt-exec',
             name: 'Read some javascript and run it',
             editorCallback: async (editor: Editor, view: MarkdownView) => {
-                let command = await promptCommand(this.app, this.history, editor)
+                const command = await promptCommand(this.app, this.history, editor)
                 message(this.runCommand(editor, view, command))
             }
         });
@@ -392,15 +397,15 @@ export class Popup extends Modal {
     constructor(app: App, msg: string, resolve: () => void) {
         super(app);
 
-        let el = new DocumentFragment()
-        let pre = el.createEl("pre")
+        const el = new DocumentFragment()
+        const pre = el.createEl("pre")
         pre.appendText(msg)
 
         this.setContent(el)
         new Setting(this.contentEl).addButton((btn) => {
             btn.setButtonText("OK")
 
-            let popup = this
+            const popup = this
 
             let keyDown = false;
             function done() {
@@ -436,7 +441,7 @@ function wordAtPoint(editor: Editor) {
 
 async function openSetting(app: any, name: string) {
     function findTab(app: any, name: string): any {
-        var result = undefined;
+        let result = undefined;
 
         app.setting.settingTabs.forEach((tab: any) => {
             if (tab.name === name) {
