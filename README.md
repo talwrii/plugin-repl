@@ -17,7 +17,7 @@ A range of convenience functions partly inspired by emacs is also provided.
 ![demo](demo.gif)
 
 # Installation
-In your obsidian vault there should be a `.obsidian/plugins` directory. You can clone this repo into that
+In your vault there should be a `.obsidian/plugins` directory. You can clone this repo into that
 directory and then run the following to build the plugin:
 
 ```
