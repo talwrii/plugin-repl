@@ -9,9 +9,9 @@ You can also define new commands in javascript.
 
 This can be useful when developing plugins, or for "light-weight" scripting without having to develop a full plugin yourself.
 
-A range of convenience functions partly inspired by emacs is also provided.
+A range of convenience functions, partly inspired by emacs, is also provided to speed up development of straight-forward scripts.
 
-*I am in no way affiliated with Obsidian. This is a third party plugin.*
+*I am in no way affiliated with Obsidian. This is a third-party plugin.*
 
 # Demo
 ![demo](demo.gif)
@@ -58,8 +58,8 @@ Various convenience functions are provided:
 ### User interface
 * `message(s:string)` - Print a notification message to the corner of the screen
 * `popup(s: string)` - Popup a dialog displaying a message
-* `promptString(prompt: string)` - Read a string from a popup
-* `fuzzySelect(choices: Array<string>, prompt?: string)` - Select from an Array of strings
+* `await promptString(prompt: string)` - Read a string from a popup
+* `await fuzzySelect(choices: Array<string>, prompt?: string)` - Select from an Array of strings
 * `openFile(f:string)` - Open a file in the current pane
 * `openUrl(url:string)` - Open a url
 
@@ -86,9 +86,9 @@ Various convenience functions are provided:
 * `lineAtPoint(p?:string)` - Retunrs the line at the cursor position. Default to current positiong.
 
 ### Reading and files
-* writeToFile(name: string) - Overwrite the markdown file called name with the given string
-* appendToFile(name: string) - Append to the markdown file called `name` with the given string
-
+* `await readFile(name: string) - Read the markup file with the title name.
+* `await writeFile(name: string)` - Overwrite the markdown file with the title name with the given string
+* `await appendToFile(name: string)` - Append the given string to the markdown with the title `name` 
 ### Processes
 * `runProc(s: string)` - Parse the bash-style command string s (e.g "ls /home") and call runProc on it
 * `runProc([command, arg1, arg2, ...])` - Run a command and return what it writes to standard out. Raise and error on error. See [require('child_process')](https://nodejs.org/api/child_process.html) for more advanced usage.
@@ -101,7 +101,6 @@ Various convenience functions are provided:
 * `repl` is the plugin object for repl.
 * `editor` is the editor object. You can use this to write to current-file
 * `app` is the application object.
-
 
 ## Defining commands
 <a name="commands"></a>
@@ -125,11 +124,11 @@ var f = newCommand(function new_command_name() {
 })
 ```
 
-You can then call f() using eval to test the function.
+You can then call `f()` using eval to test this function.
 
 ## Running code at startup
 <a name="startup"> </a>
-If you want code to run at startup, such as for [defining commands](#commands) then you can place this code in a special file called `repl.md`. If this file exists it is read when obsidian starts (or is reloaded) and the code in it is executed.
+If you want code to run at startup, such as for [defining commands](#commands), then you can place this code in a special file called `repl.md`. If this file exists, it is read when Obsidian starts (or is reloaded) and the code in it is executed.
 
 ## Asynchronous code
 For convenience, if you call an asynchronous function, plugin repl will store the result of the call in the underscore variable (`_`) or, if there was an error, the error is stored in `_error`.
@@ -148,7 +147,6 @@ dv = getDv()
 dv.pages().filter((x) => x.file.path == "templates/daily.md")[0].file.lists[0]
 ```
 
-
 ## Importing modules
 I experimented with the [obsidian modules](https://github.com/polyipseity/obsidian-modules) plugin but had issues importing full modules.
 
@@ -158,22 +156,25 @@ The approach I have used to getting access to modules when hacking on a new plug
 [Questions and answers](questions.md)
 
 ## Alternatives and prior work
-* You can [use plugins](https://docs.obsidian.md/Plugins/Getting+started/Build+a+plugin) to do the same things that you can do with plugin-repl but this tends to mean more code.
-* [js-engine](https://github.com/mProjectsCode/obsidian-js-engine-plugin) lets you evaulate javascript code in code blocks. [Execute code](https://github.com/twibiral/obsidian-execute-code) gives you code blocks in multiple languages. Neither give you access to obsidian objects to control obsidiate
-* [dataview](https://blacksmithgu.github.io/obsidian-dataview/) similarly lets you execute javascript in box and gives you access to the app object.
+* You can [use plugins](https://docs.obsidian.md/Plugins/Getting+started/Build+a+plugin) to do the same things that you can do with Plugin REPL but this tends to mean more code.
+* [js-engine](https://github.com/mProjectsCode/obsidian-js-engine-plugin) lets you evaulate JavaScript code in code blocks. [Execute code](https://github.com/twibiral/obsidian-execute-code) gives you code blocks in multiple programming languages. Neither give you access to Obsidian api objects to let you do scripting.
+* [dataview](https://blacksmithgu.github.io/obsidian-dataview/) similarly lets you execute JavasSript in code blocks.  It gives you access to the `app` object.
+* [Templater](https://github.com/SilentVoid13/Templater) defines a template language with JavaScript code blocks. It's API gives you access to the `app` object and people have used "Templates" that when run script Obsidian. 
 
-Many plugins can create commands at run time from within Obsidian - but they tend to be for more specific uses. I was influenced by [obsidian-open-settings](https://github.com/Mara-Li/obsidian-open-settings) for this, as well as for the openSettings command.
+Many plugins can create commands at run time from within Obsidian - but they tend to be for more specific uses. I was influenced by [obsidian-open-settings](https://github.com/Mara-Li/obsidian-open-settings) for this, as well as for the `openSettings` command.
+
+Both [dataview](https://blacksmithgu.github.io/obsidian-dataview/) and [Templater](https://github.com/SilentVoid13/Templater) implement provide APIs that wrap and simplify aspects of the Obsidian API, [Templater's](https://silentvoid13.github.io/Templater/internal-functions/internal-modules/app-module.html) is rather more complete 
 
 # Attribution
-This plugin was based on the [obsidian sample plugin](https://github.com/obsidianmd/obsidian-sample-plugin) from Obsidian.
+This plugin was based on the [Obsidian sample plugin](https://github.com/obsidianmd/obsidian-sample-plugin) from Obsidian.
 
-It uses the [shell-quote](https://github.com/ljharb/shell-quote) by ljharb and the source code for this is compiled into the `main.js` file. This is under an MIT license.
+It uses the [shell-quote](https://github.com/ljharb/shell-quote) library by ljharb and the source code for this is compiled into distribited `main.js`. This is under an MIT license.
 
-At runtime, it binds against [dataview](https://blacksmithgu.github.io/obsidian-dataview/) if you use dataview functionality by by blacksmithg. This is under an MIT license.
+At runtime, it binds against [dataview](https://blacksmithgu.github.io/obsidian-dataview/) by blacksmithg if you use dataview functionality. This is under an MIT license.
 
-This plugin is highly influenced by the [Emacs](https://www.gnu.org/software/emacs/) (as are most text editors)
+This plugin is highly influenced by [Emacs](https://www.gnu.org/software/emacs/) (as are most text editors).
 
-This code exposes are wraps the [Obsidian plugin api](https://docs.obsidian.md/Plugins/Getting+started/Build+a+plugin) - as all plugins do - but plugin repl does this in a rather more direct / turing complete way.
+This code exposes and wraps the [Obsidian plugin api](https://docs.obsidian.md/Plugins/Getting+started/Build+a+plugin) - as all plugins do - but Plugin REPL does this in a rather more direct / turing-complete way.
 
 ## About me
 *If you are interesting in this you might be interested in my [obsidian cookbook](https://medium.com/@readwithai/youtube-shorts-introduction-to-obsidian-56bd01506fa0).*
