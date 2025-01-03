@@ -26,16 +26,18 @@ npm run dev
 You should then be able to enable the plugin in the "Community Plugins" section of settings.
 
 ## Using
-I would advise binding CTRL-J to the commamd: "Execute the current line or selection".
+I would advise binding `CTRL-J` to the command, "Execute the current line or selection".
 
-You can then write javascript expressions and then run commands to execute these expressions, return the result.
-To define a command use the [newCommand](#commands) function.
+You can then write javascript expressions and execute them returning the result.
 
-For a lot of uses, the [convenience funcitons](#convenience) may well provide all the functional need.
-But plugin repl also gives you access to much of [Obsidian's plugin API](https://docs.obsidian.md/Plugins/Getting+started/Build+a+plugin)
+To define a *command* (run from the [Command Palette]( https://help.obsidian.md/Plugins/Command+palette) use the [newCommand](#commands) function.
+
+For a lot of uses, the [convenience funcitons](#convenience) may well provide all the functional need, But plugin repl also gives you access to much of [Obsidian's plugin API](https://docs.obsidian.md/Plugins/Getting+started/Build+a+plugin)
 through the `app`, `editor` and `repl` (plugin) objects.
 
 The `dir` and `fuzzyDir` methods can help explore these objects allong with the [API documentation](https://docs.obsidian.md/Plugins/Getting+started/Build+a+plugin).
+
+If you want functionality, such as commands, to [rerun each time Obsidian loads](#startup) you can put it in a `repl.md` file in your vault.
 
 ## Documentation
 This page provides an overview of functionality you might like to look at the [Obsidian and Plugin Repl Cookbook](https://readwithai.substack.com/p/obsidian-plugin-repl-cookbook) that provides various examples of how plugin repl can be used.
@@ -104,7 +106,7 @@ The function `newCommand` will create a new command from a function. You can the
 define a hotkey to this command.
 
 ```javascript
-&ewCommand(function command_name() {
+newCommand(function command_name() {
 ...
 })
 ```
@@ -115,7 +117,7 @@ You can use all repl's extra functions and variables (`app`, `editor` etc) in th
 If you want to test this funtion by hand you can do the following
 
 ```javascript
-var f = makeNewCommand(function new_command_name() {
+var f = newCommand(function new_command_name() {
 ...
 })
 ```
@@ -123,6 +125,7 @@ var f = makeNewCommand(function new_command_name() {
 You can then call f() using eval to test the function.
 
 ## Running code at startup
+<a name="startup"> </a>
 If you want code to run at startup, such as for [defining commands](#commands) then you can place this code in a special file called `repl.md`. If this file exists it is read when obsidian starts (or is reloaded) and the code in it is executed.
 
 ## Asynchronous code
@@ -157,7 +160,6 @@ The approach I have used to getting access to modules when hacking on a new plug
 * [dataview](https://blacksmithgu.github.io/obsidian-dataview/) similarly lets you execute javascript in box and gives you access to the app object.
 
 # Attribution
-
 This plugin was based on the [obsidian sample plugin](https://github.com/obsidianmd/obsidian-sample-plugin) from Obsidian.
 
 It uses the [shell-quote](https://github.com/ljharb/shell-quote) by ljharb and the source code for this is compiled into the `main.js` file. This is under an MIT license.
