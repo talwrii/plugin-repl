@@ -1,7 +1,16 @@
 import { App, Modal, Setting } from 'obsidian';
 
+export async function promptString(app: App, prompt: string) {
+    return new Promise((resolve, reject) => {
+        try {
+            new PromptStringModal(app, prompt, [resolve, reject]).open()
+        } catch (e) {
+            reject(e)
+        }
+    })
+}
 
-export class PromptStringModal extends Modal {
+class PromptStringModal extends Modal {
     constructor(app: App, prompt: string, onSubmit: [resolve: (_: any) => void, reject: (_: any) => void]) {
         super(app);
         this.setTitle(prompt);
