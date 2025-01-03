@@ -1,8 +1,9 @@
-# Plugin repl - Scripting and Rapid Plugin Development
+# Plugin repl - In-editor Scripting and Rapid Plugin Development
 [@readwithai](https://x.com/readwithai) ([🦋](https://bsky.app/profile/readwithai.bsky.social), [𝕏](https://x.com/readwithai), [blog](https://readwithai.substack.com/), [▶️](https://www.youtube.com/@readerai/shorts), [support](https:://ko-fi.com/readwithai), [Plugin REPL docs](https://readwithai.substack.com/p/obsidian-plugin-repl))
 
+Rapidly script Obsidian from within itself to automate tasks and test plugin code without having to reload Obsidian.
 This plugin adds an emacs-like read evaluate print loop (REPL) to Obsidian.
-This lets you execute javascript directly in a document *and*, importantly, interact with Obsidian's plugin api to make Obsidian do things (like move the cursor, insert text, open files, etc).
+This lets you execute javascript directly in a document *and*, importantly, interact with Obsidian's plugin API to make Obsidian do things (like move the cursor, insert text, open files, etc).
 You can also define new commands in javascript.
 
 This can be useful when developing plugins, or for "light-weight" scripting without having to develop a full plugin yourself.
