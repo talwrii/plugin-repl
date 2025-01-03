@@ -1,10 +1,10 @@
 {
 	"id": "plugin-repl",
 	"name": "Plugin REPL",
-	"version": "1.0.1",
+	"version": "1.0.2",
 	"minAppVersion": "0.15.0",
 	"description": "Provide an emacs-like read evaluate print loop to prototype plugins and do easy scripting",
-	"author": "Tal Wrii",
+	"author": "@readwithai",
 	"authorUrl": "https://readwithai.substack.com",
 	"fundingUrl": "https://ko-fi.com/readwithai",
 	"isDesktopOnly": true
