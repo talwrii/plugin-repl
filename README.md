@@ -28,8 +28,10 @@ npm run dev
 You should then be able to enable the plugin in the "Community Plugins" section of settings.
 
 ## Using
-For basic usage, write a Javascript expression on a line, then run the command "Execute the current line or selection" in the Command Palette. You can also highlight a region and run this command.
-I would advise binding `CTRL-J` to this command.  Other commands are provided which you can find the command palette. These allow you to execute a region of javascript without inserting the result, or read javascript in a popup window to run.
+For basic usage, write a Javascript expression on a line, then run the command "Execute the current line or selection" in the Command Palette. You can also select a region and run this command.
+I would advise binding `CTRL-J` to this command.  
+
+Other commands are provided which you can find the command palette. These allow you to execute a region of javascript without inserting the result, or read javascript in a popup window to run.
 
 To define a *command* (run from the [Command Palette]( https://help.obsidian.md/Plugins/Command+palette) use the [newCommand](#commands) function.
 
