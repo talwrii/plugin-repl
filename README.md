@@ -159,12 +159,18 @@ The approach I have used to getting access to modules when hacking on a new plug
 * [js-engine](https://github.com/mProjectsCode/obsidian-js-engine-plugin) lets you evaulate javascript code in code blocks. [Execute code](https://github.com/twibiral/obsidian-execute-code) gives you code blocks in multiple languages. Neither give you access to obsidian objects to control obsidiate
 * [dataview](https://blacksmithgu.github.io/obsidian-dataview/) similarly lets you execute javascript in box and gives you access to the app object.
 
+Many plugins can create commands at run time from within Obsidian - but they tend to be for more specific uses. I was influenced by [obsidian-open-settings](https://github.com/Mara-Li/obsidian-open-settings) for this, as well as for the openSettings command.
+
 # Attribution
 This plugin was based on the [obsidian sample plugin](https://github.com/obsidianmd/obsidian-sample-plugin) from Obsidian.
 
 It uses the [shell-quote](https://github.com/ljharb/shell-quote) by ljharb and the source code for this is compiled into the `main.js` file. This is under an MIT license.
 
 At runtime, it binds against [dataview](https://blacksmithgu.github.io/obsidian-dataview/) if you use dataview functionality by by blacksmithg. This is under an MIT license.
+
+This plugin is highly influenced by the [Emacs](https://www.gnu.org/software/emacs/) (as are most text editors)
+
+This code exposes are wraps the [Obsidian plugin api](https://docs.obsidian.md/Plugins/Getting+started/Build+a+plugin) - as all plugins do - but plugin repl does this in a rather more direct / turing complete way.
 
 ## About me
 *If you are interesting in this you might be interested in my [obsidian cookbook](https://medium.com/@readwithai/youtube-shorts-introduction-to-obsidian-56bd01506fa0).*
