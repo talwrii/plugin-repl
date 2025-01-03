@@ -26,18 +26,19 @@ npm run dev
 You should then be able to enable the plugin in the "Community Plugins" section of settings.
 
 ## Using
-I would advise binding `CTRL-J` to the command, "Execute the current line or selection".
-
-You can then write javascript expressions and execute them returning the result.
+For basic usage, write a Javascript expression on a line, then run the command "Execute the current line or selection" in the Command Palette. You can also highlight a region and run this command.
+I would advise binding `CTRL-J` to this command.  Other commands are provided which you can find the command palette. These allow you to execute a region of javascript without inserting the result, or read javascript in a popup window to run.
 
 To define a *command* (run from the [Command Palette]( https://help.obsidian.md/Plugins/Command+palette) use the [newCommand](#commands) function.
 
-For a lot of uses, the [convenience funcitons](#convenience) may well provide all the functional need, But plugin repl also gives you access to much of [Obsidian's plugin API](https://docs.obsidian.md/Plugins/Getting+started/Build+a+plugin)
+The code you use can make use of the [convenience functions and variables](#convenience). This may well provide all the functionality you need for basic scripts. But plugin repl also gives you access to much of [Obsidian's plugin API](https://docs.obsidian.md/Plugins/Getting+started/Build+a+plugin)
 through the `app`, `editor` and `repl` (plugin) objects.
 
 The `dir` and `fuzzyDir` methods can help explore these objects allong with the [API documentation](https://docs.obsidian.md/Plugins/Getting+started/Build+a+plugin).
 
 If you want functionality, such as commands, to [rerun each time Obsidian loads](#startup) you can put it in a `repl.md` file in your vault.
+
+IMPORTANT LIMITATION. Functions that you define are not shared between different invocations of plugin repl to share them you must instead define them as variables like so `var f = function f() {`
 
 ## Documentation
 This page provides an overview of functionality you might like to look at the [Obsidian and Plugin Repl Cookbook](https://readwithai.substack.com/p/obsidian-plugin-repl-cookbook) that provides various examples of how plugin repl can be used.
