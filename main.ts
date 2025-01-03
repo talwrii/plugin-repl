@@ -272,10 +272,13 @@ async function writeFile(app: any, name: string, text: string) {
 }
 
 async function appendToFile(app: App, name: string, appended: string) {
-    let existing = await readFile(app, name)
-    if (existing === undefined) {
+    let existing
+    if (!await app.vault.exists(name + ".md")) {
         existing = ""
+    } else {
+        existing = await readFile(app, name)
     }
+
     const content = existing + appended
     await writeFile(app, name, content)
 }
