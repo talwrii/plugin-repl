@@ -29,7 +29,7 @@ You should then be able to enable the plugin in the "Community Plugins" section 
 
 ## Using
 For basic usage, write a Javascript expression on a line, then run the command "Execute the current line or selection" in the Command Palette. You can also select a region and run this command.
-I would advise binding `CTRL-J` to this command.  
+I would advise binding `CTRL-J` to this command.
 
 Other commands are provided which you can find the command palette. These allow you to execute a region of javascript without inserting the result, or read javascript in a popup window to run.
 
@@ -90,7 +90,7 @@ Various convenience functions are provided:
 ### Reading and files
 * `await readFile(name: string) - Read the markup file with the title name.
 * `await writeFile(name: string)` - Overwrite the markdown file with the title name with the given string
-* `await appendToFile(name: string)` - Append the given string to the markdown with the title `name` 
+* `await appendToFile(name: string)` - Append the given string to the markdown with the title `name`
 ### Processes
 * `runProc(s: string)` - Parse the bash-style command string s (e.g "ls /home") and call runProc on it
 * `runProc([command, arg1, arg2, ...])` - Run a command and return what it writes to standard out. Raise and error on error. See [require('child_process')](https://nodejs.org/api/child_process.html) for more advanced usage.
@@ -161,11 +161,11 @@ The approach I have used to getting access to modules when hacking on a new plug
 * You can [use plugins](https://docs.obsidian.md/Plugins/Getting+started/Build+a+plugin) to do the same things that you can do with Plugin REPL but this tends to mean more code.
 * [js-engine](https://github.com/mProjectsCode/obsidian-js-engine-plugin) lets you evaulate JavaScript code in code blocks. [Execute code](https://github.com/twibiral/obsidian-execute-code) gives you code blocks in multiple programming languages. Neither give you access to Obsidian api objects to let you do scripting.
 * [dataview](https://blacksmithgu.github.io/obsidian-dataview/) similarly lets you execute JavasSript in code blocks.  It gives you access to the `app` object.
-* [Templater](https://github.com/SilentVoid13/Templater) defines a template language with JavaScript code blocks. It's API gives you access to the `app` object and people have used "Templates" that when run script Obsidian. 
+* [Templater](https://github.com/SilentVoid13/Templater) defines a template language with JavaScript code blocks. It's API gives you access to the `app` object and people have used "Templates" that when run script Obsidian.
 
 Many plugins can create commands at run time from within Obsidian - but they tend to be for more specific uses. I was influenced by [obsidian-open-settings](https://github.com/Mara-Li/obsidian-open-settings) for this, as well as for the `openSettings` command.
 
-Both [dataview](https://blacksmithgu.github.io/obsidian-dataview/) and [Templater](https://github.com/SilentVoid13/Templater) implement provide APIs that wrap and simplify aspects of the Obsidian API, [Templater's](https://silentvoid13.github.io/Templater/internal-functions/internal-modules/app-module.html) is rather more complete 
+Both [dataview](https://blacksmithgu.github.io/obsidian-dataview/) and [Templater](https://github.com/SilentVoid13/Templater) implement provide APIs that wrap and simplify aspects of the Obsidian API, [Templater's](https://silentvoid13.github.io/Templater/internal-functions/internal-modules/app-module.html) is rather more complete
 
 # Attribution
 This plugin was based on the [Obsidian sample plugin](https://github.com/obsidianmd/obsidian-sample-plugin) from Obsidian.
