@@ -83,6 +83,8 @@ Various convenience functions are provided:
 * `bufferString(start, end)` - Return the string between these two cursor positions (see `point()` and `editor.getCursor()`)
 * `insert(s:string)` - Insert a string into the buffer
 * `kill(start?: cursor, end?: cursor)` - Delete a region (defaults to the selection)
+* `await clipboardPut(s: string)`  - Put a string on the clipboard
+* `await clipboardGet()`  - Get the contents of the clipboard
 
 * `wordAtPoint(p?:string)` - Returns the word at the cursor position. Default to current postion.
 * `lineAtPoint(p?:string)` - Retunrs the line at the cursor position. Default to current positiong.

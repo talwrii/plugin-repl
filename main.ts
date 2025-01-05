@@ -77,17 +77,22 @@ export default class ReplPlugin extends Plugin {
         this.app.workspace.on('active-leaf-change', () => { plugin.loadInit() })
     }
 
-
-
     updateScopeApp() {
+        let path = this.app.workspace.getLeaf().view.path
         this.scope.add("repl", this)
         // @ts-ignore path does exist
-        this.scope.add("path", this.app.workspace.getLeaf().view.path)
+        this.scope.add("path", path)
         //@ts-ignore
         this.scope.add("vaultPath", this.app.vault.adapter.basePath)
 
         this.scope.add("dir", dir)
         this.scope.add("fuzzyDir", fuzzyDir.bind(null, this.app))
+        this.scope.add("clipboardGet", clipboardGet)
+        this.scope.add("clipboardPut", clipboardPut)
+
+        this.scope.add("renameFile", renameFile.bind(null, this.app))
+
+        this.scope.add("renameCurrent", renameFile.bind(null, this.app, path))
 
         this.scope.add("openSetting", openSetting.bind(null, this.app))
         this.scope.add("runProc", runProc)
@@ -401,4 +406,21 @@ async function openSetting(app: any, name: string) {
 
     await app.setting.open()
     await app.setting.openTabById(findTab(app, name).id)
+}
+
+async function clipboardPut(s: string) {
+    return await navigator.clipboard.writeText(s)
+}
+
+async function clipboardGet() {
+    return await navigator.clipboard.readText()
+}
+
+async function renameFile(app: App, current: string, target: string) {
+    let file = app.vault.getAbstractFileByPath(current)
+    if (file === undefined) {
+        throw new Error(`Could not find file ${file}`)
+    } else {
+        app.fileManager.renameFile(file!, target + ".md")
+    }
 }
