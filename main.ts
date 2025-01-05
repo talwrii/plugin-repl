@@ -38,8 +38,11 @@ export default class ReplPlugin extends Plugin {
 
             if (result instanceof Promise) {
                 result.then((x) => {
+                    message("async result: " + formatObj(x))
                     scope.add("_", x)
+                    scope.add("_error", undefined)
                 }).catch((e) => {
+                    message("async error: " + e.message + "(see _error)")
                     scope.add("_error", e)
                     scope.add("_", undefined)
                 })
