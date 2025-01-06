@@ -140,6 +140,16 @@ If you want code to run at startup, such as for [defining commands](#commands), 
 ## Asynchronous code
 For convenience, if you call an asynchronous function, plugin repl will store the result of the call in the underscore variable (`_`) or, if there was an error, the error is stored in `_error`.
 
+## Images and Graphs
+In order to output images and graphs you can use code-blocks. These give you access to an `el` HTML object you can use for arbitrary HTML output. Note that all javascript executes in the same scope by design: Plugin REPL is for scripting.
+
+````
+```plugin-repl
+el.appendText("hello")
+```
+````
+
+
 ## Dataview support
 The [dataview plugin](https://blacksmithgu.github.io/obsidian-dataview/) provides
 functionality to query your obsidian vault. For example, it can return pages or bullet points that match a particular query.

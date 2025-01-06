@@ -1,4 +1,7 @@
-import { Editor, MarkdownView, Notice, Plugin, EditorPosition, App, Modal, Setting, TFile } from 'obsidian';
+import {
+    Editor, MarkdownView, Notice, Plugin, EditorPosition, App, Modal, Setting, TFile,
+    MarkdownPostProcessorContext
+} from 'obsidian';
 
 import { execFileSync } from 'child_process'
 import { parse as shellParse } from 'shell-quote';
@@ -24,6 +27,12 @@ export default class ReplPlugin extends Plugin {
     scope: Scope
     history: History
     initLoaded: boolean = false
+
+    runInCodeBlock(el: HTMLElement, input: string) {
+        this.updateScopeApp()
+        this.scope.add("el", el)
+        this.scope.eval(input)
+    }
 
     runCommand(editor: Editor, view: MarkdownView, region: string) {
         let output: string = "";
@@ -78,7 +87,12 @@ export default class ReplPlugin extends Plugin {
         let plugin = this
         // This approach is stolen from vimrc - this event runs on startup (and lots of times after)
         this.app.workspace.on('active-leaf-change', () => { plugin.loadInit() })
+        this.registerMarkdownCodeBlockProcessor("plugin-repl", renderCodeBlock.bind(null, plugin))
+
     }
+
+
+
 
     updateScopeApp() {
         let path = this.app.workspace.getLeaf().view.path
@@ -435,4 +449,9 @@ function replRequire(vaultPath: string, name: string) {
     delete window.require.cache[modPath]
     let mod = window.require(vaultPath + "/plugin-repl-imports/imports.js")
     return mod[name]
+}
+
+
+function renderCodeBlock(plugin: ReplPlugin, source: string, el: HTMLElement, ctx: MarkdownPostProcessorContext) {
+    plugin.runInCodeBlock(el, source)
 }
