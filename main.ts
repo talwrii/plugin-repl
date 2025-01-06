@@ -86,7 +86,8 @@ export default class ReplPlugin extends Plugin {
         // @ts-ignore path does exist
         this.scope.add("path", path)
         //@ts-ignore
-        this.scope.add("vaultPath", this.app.vault.adapter.basePath)
+        let vaultPath = this.app.vault.adapter.basePath
+        this.scope.add("vaultPath", vaultPath)
 
         this.scope.add("dir", dir)
         this.scope.add("fuzzyDir", fuzzyDir.bind(null, this.app))
@@ -94,6 +95,7 @@ export default class ReplPlugin extends Plugin {
         this.scope.add("clipboardPut", clipboardPut)
 
         this.scope.add("renameFile", renameFile.bind(null, this.app))
+        this.scope.add("replRequire", replRequire.bind(null, vaultPath))
 
         this.scope.add("renameCurrent", renameFile.bind(null, this.app, path))
 
@@ -426,4 +428,11 @@ async function renameFile(app: App, current: string, target: string) {
     } else {
         app.fileManager.renameFile(file!, target + ".md")
     }
+}
+
+function replRequire(vaultPath: string, name: string) {
+    let module = vaultPath + "/plugin-repl-imports/imports.js"
+    delete require.cache[module]
+    let mod = require(module)
+    return mod[name]
 }

@@ -97,9 +97,12 @@ Various convenience functions are provided:
 * `runProc(s: string)` - Parse the bash-style command string s (e.g "ls /home") and call runProc on it
 * `runProc([command, arg1, arg2, ...])` - Run a command and return what it writes to standard out. Raise and error on error. See [require('child_process')](https://nodejs.org/api/child_process.html) for more advanced usage.
 
-### Plugins
+### Plugins and Modules
 * `plugin(s:string)` - Get the object for a plugin. You may be able to reuse features from another plugin with this.
 * `getDv()` - Get the dataview object
+* `requireRequire(s: string)` - Import the node module installed using [Plugin Repl Imports](
+https://github.com/talwrii/plugin-repl-imports)
+
 
 ### API access
 * `repl` is the plugin object for repl.
@@ -152,9 +155,9 @@ dv.pages().filter((x) => x.file.path == "templates/daily.md")[0].file.lists[0]
 ```
 
 ## Importing modules
-I experimented with the [obsidian modules](https://github.com/polyipseity/obsidian-modules) plugin but had issues importing full modules.
+Modules in Obsidian work in an interesting way that makes installing from NPM a little tricky. There is a [technical explanation here](https://github.com/talwrii/plugin-repl-imports#technical).
 
-The approach I have used to getting access to modules when hacking on a new plugin is to create a new plugin and half that plugin set `self.MODULE = MODULE` on load. You can then access this self open from the repl.
+There is a system to provide imports to Plugin REPL provided by [this repository](https://github.com/talwrii/plugin-repl-imports). To use this, you have to checkout a repository into your vault, update a text file, run a make command and then you can use the `replRequire` function, as described in the [docs]((https://github.com/talwrii/plugin-repl-imports).
 
 ## Some questions and answers about plugin repl
 [Questions and answers](questions.md)
