@@ -157,7 +157,7 @@ dv.pages().filter((x) => x.file.path == "templates/daily.md")[0].file.lists[0]
 ## Importing modules
 Modules in Obsidian work in an interesting way that makes installing from NPM a little tricky. There is a [technical explanation here](https://github.com/talwrii/plugin-repl-imports#technical).
 
-There is a system to provide imports to Plugin REPL provided by [this repository](https://github.com/talwrii/plugin-repl-imports). To use this, you have to checkout a repository into your vault, update a text file, run a make command and then you can use the `replRequire` function, as described in the [docs]((https://github.com/talwrii/plugin-repl-imports).
+There is a system to provide imports to Plugin REPL provided by [this repository](https://github.com/talwrii/plugin-repl-imports). To use this, you have to checkout a repository into your vault, update a text file, run a make command and then you can use the `replRequire` function, as described in the [docs](https://github.com/talwrii/plugin-repl-imports).
 
 ## Some questions and answers about plugin repl
 [Questions and answers](questions.md)
