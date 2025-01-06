@@ -431,8 +431,8 @@ async function renameFile(app: App, current: string, target: string) {
 }
 
 function replRequire(vaultPath: string, name: string) {
-    let module = vaultPath + "/plugin-repl-imports/imports.js"
-    delete require.cache[module]
-    let mod = require(module)
+    let modPath = vaultPath + "/plugin-repl-imports/imports.js"
+    delete window.require.cache[modPath]
+    let mod = window.require(vaultPath + "/plugin-repl-imports/imports.js")
     return mod[name]
 }
