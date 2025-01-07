@@ -445,10 +445,10 @@ async function renameFile(app: App, current: string, target: string) {
 }
 
 function replRequire(vaultPath: string, name: string) {
-    let modPath = vaultPath + "/plugin-repl-imports/imports.js"
+    let modPath = vaultPath + "/plugin-repl-imports/imports_bundled.js"
     delete window.require.cache[modPath]
-    let mod = window.require(vaultPath + "/plugin-repl-imports/imports.js")
-    return mod[name]
+    let mod = window.require(modPath)
+    return mod.packages[name]
 }
 
 
