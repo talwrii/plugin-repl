@@ -453,5 +453,10 @@ function replRequire(vaultPath: string, name: string) {
 
 
 function renderCodeBlock(plugin: ReplPlugin, source: string, el: HTMLElement, ctx: MarkdownPostProcessorContext) {
-    plugin.runInCodeBlock(el, source)
+    try {
+        plugin.runInCodeBlock(el, source)
+    } catch (e) {
+        el.appendText(e.message)
+        el.appendText(e.stack)
+    }
 }
