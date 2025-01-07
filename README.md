@@ -100,7 +100,7 @@ Various convenience functions are provided:
 ### Plugins and Modules
 * `plugin(s:string)` - Get the object for a plugin. You may be able to reuse features from another plugin with this.
 * `getDv()` - Get the dataview object
-* `requireRequire(s: string)` - Import the node module installed using [Plugin Repl Imports](
+* `replRequire(s: string)` - Import the node module installed using [Plugin Repl Imports](
 https://github.com/talwrii/plugin-repl-imports)
 
 
