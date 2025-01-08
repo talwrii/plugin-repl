@@ -1,6 +1,6 @@
 import {
     Editor, MarkdownView, Notice, Plugin, EditorPosition, App, Modal, Setting, TFile,
-    MarkdownPostProcessorContext
+    MarkdownPostProcessorContext, Command
 } from 'obsidian';
 
 import { execFileSync } from 'child_process'
@@ -21,6 +21,7 @@ import { fuzzySelect } from './fuzzy'
 import { promptString } from './prompt'
 import { promptCommand } from './promptCommand'
 import { popup } from './popup'
+import { openSetting } from './settings'
 
 
 export default class ReplPlugin extends Plugin {
@@ -172,6 +173,11 @@ export default class ReplPlugin extends Plugin {
         this.addToScopeWithDoc(
             "command", command.bind(null, this.app),
             "(name: string) Run the command called string (Call commands for a list)"
+
+        )
+        this.addToScopeWithDoc(
+            "commands", commands.bind(null, this.app),
+            "Return the ids of all commands. Perhaps you want to call fuzzySelect(commands())."
 
         )
         this.addToScopeWithDoc(
@@ -372,8 +378,6 @@ function runProc(commandAndArgs: string | Array<string>): string {
     return execFileSync(command, args).toString()
 }
 
-
-
 function dir(obj: any) {
     const p = [];
     for (; obj != null; obj = Object.getPrototypeOf(obj)) {
@@ -426,7 +430,7 @@ async function writeFile(app: any, name: string, text: string) {
     return await app.vault.process(file, (_: string) => text)
 }
 
-async function appendToFile(app: App, name: string, appended: string) {
+async function appendToFile(app: any, name: string, appended: string) {
     let existing
     if (!await app.vault.exists(name + ".md")) {
         existing = ""
@@ -493,7 +497,6 @@ function pointMin(): EditorPosition {
     return { line: 0, ch: 0 }
 }
 
-
 function lineNumber(editor: Editor): number {
     return editor.getCursor().line
 }
@@ -505,7 +508,6 @@ function point(editor: Editor): EditorPosition {
 function mark(editor: Editor) {
     return editor.getCursor("from")
 }
-
 
 function endOfLine(editor: any) {
     const cursor = editor.getCursor()
@@ -522,40 +524,11 @@ function openUrl(url: string) {
     return undefined
 }
 
-
-
-
 function wordAtPoint(editor: Editor) {
     const pos = editor.getCursor()
     const [start, end] = expandRegionWithRegexp(editor, /\w/, pos, { ...pos, ch: pos.ch + 1 })
     const line = editor.getLine(pos.line)
     return line.slice(start.ch, end.ch)
-}
-
-async function openSetting(app: any, name: string) {
-    function findTab(app: any, name: string): any {
-        let result = undefined;
-
-        app.setting.settingTabs.forEach((tab: any) => {
-            if (tab.name === name) {
-                result = tab
-            }
-        })
-
-        app.setting.pluginTabs.forEach((tab: any) => {
-            if (tab.name === name) {
-                result = tab
-            }
-        })
-
-        if (result === undefined) {
-            throw new Error("Could not find tab with name:" + name)
-        }
-        return result
-    }
-
-    await app.setting.open()
-    await app.setting.openTabById(findTab(app, name).id)
 }
 
 async function clipboardPut(s: string) {
@@ -594,4 +567,9 @@ function renderCodeBlock(plugin: ReplPlugin, source: string, el: HTMLElement, ct
 
 function functions(plugin: ReplPlugin, app: App) {
     fuzzySelect(app, plugin.function_docs)
+}
+
+
+function commands(app: any) {
+    return app.commands.listCommands().map((x: Command) => x.id)
 }

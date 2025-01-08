@@ -54,7 +54,8 @@ Various convenience functions are provided:
 * `functions()` - List the convenience functions and methods provided
 
 * `source(f:string)` - Open the markdown file called f and execute the code in it
-* `command(s:string)` - Run a command
+* `command(id:string)` - Run a command
+* `commands()` - Return all the ids for commands. You may want to call `fuzzySelect(commands())`
 * `newCommand(function name_with_underscores { ...)` - Create a new command with name "new name" which runs the function new_name
 * `dir(o:Object)` - List the property in an object
 * `fuzzyDir(o: Object)` - Explore the properties of an object with a fuzzy selector
@@ -150,8 +151,6 @@ In order to output images and graphs you can use code-blocks. These give you acc
 el.appendText("hello")
 ```
 ````
-
-
 ## Dataview support
 The [dataview plugin](https://blacksmithgu.github.io/obsidian-dataview/) provides
 functionality to query your obsidian vault. For example, it can return pages or bullet points that match a particular query.
