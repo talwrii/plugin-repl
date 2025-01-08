@@ -42,5 +42,4 @@ class FuzzySelector extends FuzzySuggestModal<string> {
             this.reject(e)
         }
     }
-
 }

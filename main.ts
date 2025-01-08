@@ -27,6 +27,7 @@ export default class ReplPlugin extends Plugin {
     scope: Scope
     history: History
     initLoaded: boolean = false
+    function_docs: Array<string> = []
 
     runInCodeBlock(el: HTMLElement, input: string) {
         this.updateScopeApp()
@@ -91,8 +92,13 @@ export default class ReplPlugin extends Plugin {
 
     }
 
-
-
+    addToScopeWithDoc(name: string, obj: any, doc: string) {
+        this.scope.add(name, obj)
+        let full_doc = `${name} -- ${doc}`
+        if (this.function_docs.indexOf(full_doc) == -1) {
+            this.function_docs.push(full_doc)
+        }
+    }
 
     updateScopeApp() {
         let path = this.app.workspace.getLeaf().view.path
@@ -103,51 +109,176 @@ export default class ReplPlugin extends Plugin {
         let vaultPath = this.app.vault.adapter.basePath
         this.scope.add("vaultPath", vaultPath)
 
-        this.scope.add("dir", dir)
-        this.scope.add("fuzzyDir", fuzzyDir.bind(null, this.app))
-        this.scope.add("clipboardGet", clipboardGet)
-        this.scope.add("clipboardPut", clipboardPut)
+        this.addToScopeWithDoc(
+            "functions", functions.bind(null, this, this.app),
+            "Search convenience functions and variables provided by Plugin REPL"
+        )
+        this.addToScopeWithDoc(
+            "dir", dir,
+            "Return a list of the attributes of the Object"
+        )
+        this.addToScopeWithDoc(
+            "fuzzyDir", fuzzyDir.bind(null, this.app),
+            "Popup a fuzzy search listing the attributes of an Object"
+        )
+        this.addToScopeWithDoc(
+            "clipboardGet", clipboardGet,
+            "Get the contents of the clipboard"
 
-        this.scope.add("renameFile", renameFile.bind(null, this.app))
-        this.scope.add("replRequire", replRequire.bind(null, vaultPath))
+        )
+        this.addToScopeWithDoc(
+            "clipboardPut", clipboardPut,
+            "Put a string in the clipboard"
+        )
 
-        this.scope.add("renameCurrent", renameFile.bind(null, this.app, path))
+        this.addToScopeWithDoc(
+            "renameFile", renameFile.bind(null, this.app),
+            "(a:string, b: string) Move the markdown note called a to b"
+        )
+        this.addToScopeWithDoc(
+            "replRequire", replRequire.bind(null, vaultPath),
+            "Import the JavaScript module installed with plugin-import-module."
+        )
 
-        this.scope.add("openSetting", openSetting.bind(null, this.app))
-        this.scope.add("runProc", runProc)
-        this.scope.add("newCommand", this.makeNewCommand())
-        this.scope.add("source", this.makeSource(this.app))
-        this.scope.add("plugin", plugin.bind(null, this.app))
-        this.scope.add("promptString", promptString.bind(null, this.app))
-        this.scope.add("command", command.bind(null, this.app))
-        this.scope.add("readFile", readFile.bind(null, this.app))
-        this.scope.add("writeFile", writeFile.bind(null, this.app))
-        this.scope.add("appendToFile", appendToFile.bind(null, this.app))
+        this.addToScopeWithDoc(
+            "renameCurrent", renameFile.bind(null, this.app, path),
+            "Change the note title."
+        )
 
-        this.scope.add("getDv", getDv.bind(null, this.app))
-        this.scope.add("message", message)
-        this.scope.add("openFile", openFile.bind(null, this.app))
-        this.scope.add("fuzzySelect", fuzzySelect.bind(null, this.app))
-        this.scope.add("openUrl", openUrl)
+        this.addToScopeWithDoc(
+            "openSetting", openSetting.bind(null, this.app),
+            "Open a setting tab with the name. (See the names in settings for possible values)"
+
+        )
+        this.addToScopeWithDoc(
+            "runProc", runProc,
+            "(s: string) or (['prog', 'arg1', 'args2']) run a program and return its output"
+        )
+        this.addToScopeWithDoc(
+            "newCommand", this.makeNewCommand(),
+            "Given a function called command_name_with_underscores create a new command that runs this function"
+        )
+        this.addToScopeWithDoc(
+            "source", this.makeSource(this.app),
+            "(note_name:string) load (import / require) the note with title note_name and execute it with plugin repl"
+        )
+        this.addToScopeWithDoc(
+            "plugin", plugin.bind(null, this.app),
+            "(id: string) Return the plugin object for the plugin with id (see app.plugins.plugins) to get names ")
+        this.addToScopeWithDoc(
+            "promptString", promptString.bind(null, this.app),
+            "(prompt?: string) Read a string from a popup window "
+        )
+        this.addToScopeWithDoc(
+            "command", command.bind(null, this.app),
+            "(name: string) Run the command called string (Call commands for a list)"
+
+        )
+        this.addToScopeWithDoc(
+            "readFile", readFile.bind(null, this.app),
+            "(title: string) Read the contents of the file with the title name"
+
+        )
+        this.addToScopeWithDoc(
+            "writeFile", writeFile.bind(null, this.app),
+            "(title: string, contents: string) Write the contents to the file with a title"
+        )
+        this.addToScopeWithDoc(
+            "appendToFile", appendToFile.bind(null, this.app),
+            "(title: string, content: string) Add the content to the note with a titel"
+        )
+
+        this.addToScopeWithDoc(
+            "getDv", getDv.bind(null, this.app),
+            "Get hold of the dataview object for querying pages"
+
+        )
+        this.addToScopeWithDoc(
+            "message", message,
+            "(msg: string) Popup a message with a notification message msg"
+        )
+        this.addToScopeWithDoc(
+            "openFile", openFile.bind(null, this.app),
+            "(title: string) Open the file with title string in Obsidian"
+        )
+        this.addToScopeWithDoc(
+            "fuzzySelect", fuzzySelect.bind(null, this.app),
+            "(options: Array<string>, prompt?: string) Select from options with fuzzy search"
+
+        )
+        this.addToScopeWithDoc(
+            "openUrl", openUrl,
+            "(url: string) Open this url in a browser "
+        )
     }
 
     updateScopeEditor(editor: Editor, view: MarkdownView) {
-        this.scope.add("popup", popup.bind(null, this.app, editor))
-        this.scope.add("endOfLine", endOfLine.bind(null, editor))
-        this.scope.add("lineNumber", lineNumber.bind(null, editor))
-        this.scope.add("bufferString", bufferString.bind(null, editor))
-        this.scope.add("point", point.bind(null, editor))
-        this.scope.add("mark", mark.bind(null, editor))
-        this.scope.add("insert", insert.bind(null, editor))
-        this.scope.add("kill", kill.bind(null, editor))
-        this.scope.add("lineAtPoint", lineAtPoint.bind(null, editor))
-        this.scope.add("wordAtPoint", wordAtPoint.bind(null, editor))
-        this.scope.add("pointMin", pointMin)
-        this.scope.add("pointMax", pointMax.bind(null, editor))
-        this.scope.add("selection", selection.bind(null, editor))
-        this.scope.add("forwardChar", forwardChar.bind(null, editor))
-        this.scope.add("editor", editor)
-        this.scope.add("view", view)
+        this.addToScopeWithDoc(
+            "popup", popup.bind(null, this.app, editor),
+            "(message: string) Open a popup showing a message"
+        )
+        this.addToScopeWithDoc(
+            "endOfLine", endOfLine.bind(null, editor),
+            "Go the end of the line"
+        )
+        this.addToScopeWithDoc(
+            "lineNumber", lineNumber.bind(null, editor),
+            "Return the current line number"
+        )
+        this.addToScopeWithDoc(
+            "bufferString", bufferString.bind(null, editor),
+            "Return the content of the buffer. If you provide (start, end) cursor positions return the string between start end"
+        )
+        this.addToScopeWithDoc(
+            "point", point.bind(null, editor),
+            "Return the current cursor position"
+        )
+        this.addToScopeWithDoc(
+            "mark", mark.bind(null, editor),
+            "Return the cursor at the beginning of the current selection"
+        )
+        this.addToScopeWithDoc(
+            "insert", insert.bind(null, editor),
+            "(s: string) Insert a string at the current point"
+        )
+        this.addToScopeWithDoc(
+            "kill", kill.bind(null, editor),
+            "(start: Position, end: Position) Delete the region between start and end"
+        )
+        this.addToScopeWithDoc(
+            "lineAtPoint", lineAtPoint.bind(null, editor),
+            "Return the content of the line where the cursor is. Optionally takes a cursor position as an argument"
+        )
+        this.addToScopeWithDoc(
+            "wordAtPoint", wordAtPoint.bind(null, editor),
+            "Returns the word where the cursor is. Optionally takes a cursor position as an argument"
+
+        )
+        this.addToScopeWithDoc(
+            "pointMin", pointMin,
+            "Returns the cursor position at the beginning of the note"
+        )
+        this.addToScopeWithDoc(
+            "pointMax", pointMax.bind(null, editor),
+            "Returns the cursor positoin at the beginning of the note"
+        )
+        this.addToScopeWithDoc(
+            "selection", selection.bind(null, editor),
+            "Returns the text of the selection."
+        )
+        this.addToScopeWithDoc(
+            "forwardChar", forwardChar.bind(null, editor),
+            "(count?: number) Move count (or 1) character forward"
+
+        )
+        this.addToScopeWithDoc(
+            "editor", editor,
+            "The editor object for the note. (See Obsidian api)"
+        )
+        this.addToScopeWithDoc(
+            "view", view,
+            "The view for the current not (See Obsidian api)"
+        )
     }
 
     makeNewCommand() {
@@ -445,9 +576,9 @@ async function renameFile(app: App, current: string, target: string) {
 }
 
 function replRequire(vaultPath: string, name: string) {
-    let modPath = vaultPath + "/plugin-repl-imports/imports_bundled.js"
+    const modPath = vaultPath + "/plugin-repl-imports/imports_bundled.js"
     delete window.require.cache[modPath]
-    let mod = window.require(modPath)
+    const mod = window.require(modPath)
     return mod.packages[name]
 }
 
@@ -459,4 +590,8 @@ function renderCodeBlock(plugin: ReplPlugin, source: string, el: HTMLElement, ct
         el.appendText(e.message)
         el.appendText(e.stack)
     }
+}
+
+function functions(plugin: ReplPlugin, app: App) {
+    fuzzySelect(app, plugin.function_docs)
 }

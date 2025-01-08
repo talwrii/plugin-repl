@@ -51,6 +51,8 @@ This page provides an overview of functionality you might like to look at the [O
 <a name="convenience"> </a>
 Various convenience functions are provided:
 
+* `functions()` - List the convenience functions and methods provided
+
 * `source(f:string)` - Open the markdown file called f and execute the code in it
 * `command(s:string)` - Run a command
 * `newCommand(function name_with_underscores { ...)` - Create a new command with name "new name" which runs the function new_name
