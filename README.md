@@ -189,9 +189,9 @@ It uses the [shell-quote](https://github.com/ljharb/shell-quote) library by ljha
 
 At runtime, it binds against [dataview](https://blacksmithgu.github.io/obsidian-dataview/) by blacksmithg if you use dataview functionality. This is under an MIT license.
 
-This plugin is highly influenced by [Emacs](https://www.gnu.org/software/emacs/) (as are most text editors).
+This plugin is highly influenced by [Emacs](https://www.gnu.org/software/emacs/) (as are most text editors and a lot of software).
 
-This code exposes and wraps the [Obsidian plugin api](https://docs.obsidian.md/Plugins/Getting+started/Build+a+plugin) - as all plugins do - but Plugin REPL does this in a rather more direct / turing-complete way.
+This code exposes and wraps the [Obsidian plugin API](https://docs.obsidian.md/Plugins/Getting+started/Build+a+plugin) - as all plugins do - but Plugin REPL does this in a rather more direct / turing-complete way.
 
 ## About me
 *If you are interesting in this you might be interested in my [obsidian cookbook](https://medium.com/@readwithai/youtube-shorts-introduction-to-obsidian-56bd01506fa0).*
