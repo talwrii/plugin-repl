@@ -22,7 +22,6 @@ function runInScope(f, context) {
     }
 }
 
-
 function makeScope (target) {
     return new Proxy(target, {
         has(target, prop) { return true; },

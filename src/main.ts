@@ -472,8 +472,8 @@ async function writeFile(app: App, name: string, text: string) {
 }
 
 async function appendToFile(app: App, name: string, appended: string) {
-    let file = await app.vault.getFileByPath(name)!
-    if (file === undefined) {
+    let file = app.vault.getFileByPath(name + ".md")!
+    if (file === null) {
         return await writeFile(app, name, appended)
     } else {
         return await app.vault.append(file, appended)

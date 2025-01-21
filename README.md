@@ -17,7 +17,7 @@ A range of convenience functions, partly inspired by emacs, is also provided to 
 ![demo](demo.gif)
 
 # Installation
-In your vault there should be a `.obsidian/plugins` directory. You can clone this repo into that
+In your vault, there should be a `.obsidian/plugins` directory. You can clone this repo into that
 directory and then run the following to build the plugin:
 
 ```
@@ -33,16 +33,16 @@ I would advise binding `CTRL-J` to this command.
 
 Other commands are provided which you can find the command palette. These allow you to execute a region of JavaScript without inserting the result, or read JavaScript in a popup window to run.
 
-To define a *command* (run from the [Command Palette]( https://help.obsidian.md/Plugins/Command+palette) use the [newCommand](#commands) function.
+To define a *command* ( run [Command Palette]( https://help.obsidian.md/Plugins/Command+palette) or a hotkey ) use the [newCommand](#commands) function.
 
-The code you use can make use of the [convenience functions and variables](#convenience). This may well provide all the functionality you need for basic scripts. But plugin repl also gives you access to much of [Obsidian's plugin API](https://docs.obsidian.md/Plugins/Getting+started/Build+a+plugin)
+The code you write can make use of the [convenience functions and variables](#convenience). This may well provide all the functionality you need for basic scripts, but Plugin REPL also gives you access to much of [Obsidian's plugin API](https://docs.obsidian.md/Plugins/Getting+started/Build+a+plugin)
 through the `app`, `editor` and `repl` (plugin) objects.
 
 The `dir` and `fuzzyDir` methods can help explore these objects allong with the [API documentation](https://docs.obsidian.md/Plugins/Getting+started/Build+a+plugin).
 
 If you want functionality, such as commands, to [rerun each time Obsidian loads](#startup) you can put it in a `repl.md` file in your vault.
 
-IMPORTANT LIMITATION. Functions that you define are not shared between different invocations of plugin repl to share them you must instead define them as variables like so `var f = function f() {`
+IMPORTANT LIMITATION. Functions that you define are not shared between different invocations of plugin repl. To share them, you must instead define them as variables like so: `var f = function f() {`
 
 ## Documentation
 This page provides an overview of functionality you might like to look at the [Obsidian and Plugin Repl Cookbook](https://readwithai.substack.com/p/obsidian-plugin-repl-cookbook) that provides various examples of how plugin repl can be used.
@@ -119,13 +119,13 @@ The function `newCommand` will create a new command from a function. You can the
 define a hotkey to this command.
 
 ```javascript
-newCommand(function command_name() {
+newCommand(function new_command_name() {
 ...
 })
 ```
 
 creates a command with the name "new command name" (and the id `new_command_name`).
-You can use all repl's extra functions and variables (`app`, `editor` etc) in this function.
+You can use all Plugin REPL's extra functions and variables (`app`, `editor` etc) in this function.
 
 If you want to test this funtion by hand you can do the following
 
@@ -135,7 +135,7 @@ var f = newCommand(function new_command_name() {
 })
 ```
 
-You can then call `f()` using eval to test this function.
+You can then call `f()` using eval to test it.
 
 ## Running code at startup
 <a name="startup"> </a>
@@ -167,7 +167,7 @@ dv.pages().filter((x) => x.file.path == "templates/daily.md")[0].file.lists[0]
 ```
 
 ## Templater support
-The [Templater](https://github.com/SilentVoid13/Templater) provides functionality to insert JavaScript. If you have installed Templater you can use
+The [Templater](https://github.com/SilentVoid13/Templater) library provides functionality to insert templates with some parts of the template derived from JavaScript code. If you have installed Templater you can use
 the async `templater_expand` function to expand template strings.
 
 This creates a command that inserts a files tags using a template.
@@ -177,8 +177,7 @@ newCommand(async function templater_example() {
 })
 ```
 
-If you want to expand a template for a file you can use `readFile`
-
+If you want to expand a template for a file you can use `readFile`:
 ```
 newCommand(async function templater_from_file() {
     insert(await templater_expand(await readFile("myTemplate")))
@@ -189,7 +188,7 @@ newCommand(async function templater_from_file() {
 ## Importing modules
 Modules in Obsidian work in an interesting way that makes installing from NPM a little tricky. There is a [technical explanation here](https://github.com/talwrii/plugin-repl-imports#technical).
 
-There is a system to provide imports to Plugin REPL provided by [this repository](https://github.com/talwrii/plugin-repl-imports). To use this, you have to checkout a repository into your vault, update a text file, run a make command and then you can use the `replRequire` function, as described in the [docs](https://github.com/talwrii/plugin-repl-imports).
+There is a system to provide imports to Plugin REPL provided by [this repository](https://github.com/talwrii/plugin-repl-imports). To use it, you have to checkout a repository into your vault, update a text file, run a make command and then you can use the `replRequire` function within Obsidian, as described in the [docs](https://github.com/talwrii/plugin-repl-imports).
 
 ## Some questions and answers about plugin repl
 [Questions and answers](questions.md)
