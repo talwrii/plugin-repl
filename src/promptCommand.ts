@@ -13,12 +13,12 @@ export function promptCommand(app: App, history: History, editor: Editor): Promi
 class CommandModal extends Modal {
     constructor(app: App, history: History, onSubmit: (result: string) => void) {
         super(app);
-        this.setTitle('Execute javascript (press return)');
+        this.setTitle('Execute JavaScript (press return to run)');
 
         let enterDown = false;
         let command = '';
         new Setting(this.contentEl)
-            .setName('Javascript')
+            .setName('JavaScript')
             .addText((text) => {
                 text.inputEl.addEventListener("keydown", ({ key }) => {
                     if (key === 'Enter') {

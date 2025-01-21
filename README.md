@@ -4,8 +4,8 @@
 Rapidly automate tasks from within notes. Test code for plugins without having to reload.
 
 This plugin adds an emacs-like read evaluate print loop (REPL) to Obsidian.
-This lets you execute javascript directly in a document *and*, importantly, interact with Obsidian's plugin API to make Obsidian do things (like move the cursor, insert text, open files, etc).
-You can also define new commands in javascript.
+This lets you execute JavaScript directly in a document *and*, importantly, interact with Obsidian's plugin API to make Obsidian do things (like move the cursor, insert text, open files, etc).
+You can also define new commands in JavaScript.
 
 This can be useful when developing plugins, or for "light-weight" scripting without having to develop a full plugin yourself.
 
@@ -28,10 +28,10 @@ npm run dev
 You should then be able to enable the plugin in the "Community Plugins" section of settings.
 
 ## Using
-For basic usage, write a Javascript expression on a line, then run the command "Execute the current line or selection" in the Command Palette. You can also select a region and run this command.
+For basic usage, write a JavaScript expression on a line, then run the command "Execute the current line or selection" in the Command Palette. You can also select a region and run this command.
 I would advise binding `CTRL-J` to this command.
 
-Other commands are provided which you can find the command palette. These allow you to execute a region of javascript without inserting the result, or read javascript in a popup window to run.
+Other commands are provided which you can find the command palette. These allow you to execute a region of JavaScript without inserting the result, or read JavaScript in a popup window to run.
 
 To define a *command* (run from the [Command Palette]( https://help.obsidian.md/Plugins/Command+palette) use the [newCommand](#commands) function.
 
@@ -145,7 +145,7 @@ If you want code to run at startup, such as for [defining commands](#commands), 
 For convenience, if you call an asynchronous function, plugin repl will store the result of the call in the underscore variable (`_`) or, if there was an error, the error is stored in `_error`.
 
 ## Images and Graphs
-In order to output images and graphs you can use code-blocks. These give you access to an `el` HTML object you can use for arbitrary HTML output. Note that all javascript executes in the same scope by design: Plugin REPL is for scripting.
+In order to output images and graphs you can use code-blocks. These give you access to an `el` HTML object you can use for arbitrary HTML output. Note that all JavaScript executes in the same scope by design: Plugin REPL is for scripting.
 
 ````
 ```plugin-repl
@@ -167,7 +167,7 @@ dv.pages().filter((x) => x.file.path == "templates/daily.md")[0].file.lists[0]
 ```
 
 ## Templater support
-The [Templater](https://github.com/SilentVoid13/Templater) provides functionality to insert javascript. If you have installed Templater you can use
+The [Templater](https://github.com/SilentVoid13/Templater) provides functionality to insert JavaScript. If you have installed Templater you can use
 the async `templater_expand` function to expand template strings.
 
 This creates a command that inserts a files tags using a template.
