@@ -397,7 +397,7 @@ export default class ReplPlugin extends Plugin {
 }
 
 async function openFile(app: App, name: string) {
-    await app.workspace.openLinkText(name)
+    await app.workspace.openLinkText(name, "")
 }
 
 function plugin(app: PrivateApp, name: string) {
