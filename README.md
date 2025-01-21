@@ -9,7 +9,7 @@ You can also define new commands in JavaScript.
 
 This can be useful when developing plugins, or for "light-weight" scripting without having to develop a full plugin yourself.
 
-A range of convenience functions, partly inspired by emacs, is also provided to speed up development of straight-forward scripts.
+A range of convenience functions, partly inspired by emacs, is also provided to speed up development of straight-forward features.
 
 *I am in no way affiliated with Obsidian. This is a third-party plugin.*
 
