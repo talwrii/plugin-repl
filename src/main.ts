@@ -339,7 +339,7 @@ export default class ReplPlugin extends Plugin {
 
     addCommands() {
         this.addCommand({
-            id: 'repl-enter',
+            id: 'eval',
             name: 'Execute the current line or selection',
             editorCallback: (editor: Editor, view: MarkdownView) => {
                 try {
@@ -362,8 +362,8 @@ export default class ReplPlugin extends Plugin {
         });
 
         this.addCommand({
-            id: 'repl-exec',
-            name: 'Execute run like or selection (no result)',
+            id: 'exec',
+            name: 'Execute current line or selection (without printing result)',
             editorCallback: (editor: Editor, view: MarkdownView) => {
                 const cursor = editor.getCursor()
                 const region = editor.getSelection() || editor.getLine(cursor.line)
@@ -372,8 +372,8 @@ export default class ReplPlugin extends Plugin {
         });
 
         this.addCommand({
-            id: 'repl-prompt-exec',
-            name: 'Read some JavaScript and run it',
+            id: 'prompt-exec',
+            name: 'Read some JavaScript and run it (result shown as Notification)',
             editorCallback: async (editor: Editor, view: MarkdownView) => {
                 const command = await promptCommand(this.app, this.history, editor)
                 message(this.runCommand(editor, view, command))
