@@ -1,6 +1,12 @@
-export async function templater_expand(app: any, template: string) {
+import { Plugin, TFile } from 'obsidian'
+import { PrivateApp } from './types';
+
+
+export async function templater_expand(app: PrivateApp, template: string) {
     let path = this.app.workspace.getLeaf().view.path
-    let p = app.plugins.getPlugin("templater-obsidian")
+
+    // We are interacting with the internal templater api once
+    let p = app.plugins.getPlugin("templater-obsidian") as any
     if (p === undefined) {
         new Error("Templater must be installed")
     }
@@ -31,9 +37,9 @@ export async function templater_expand(app: any, template: string) {
     return output_content
 }
 
-async function getTp(app: any) {
+async function getTp(app: PrivateApp) {
     let path = this.app.workspace.getLeaf().view.path
-    let p = app.plugins.getPlugin("templater-obsidian")
+    let p = app.plugins.getPlugin("templater-obsidian") as any
     if (p === undefined) {
         new Error("Templater must be installed")
     }

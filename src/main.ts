@@ -1,6 +1,6 @@
 import {
     Editor, MarkdownView, Notice, Plugin, EditorPosition, App, Modal, Setting, TFile,
-    MarkdownPostProcessorContext, Command
+    MarkdownPostProcessorContext, Command, FileSystemAdapter,
 } from 'obsidian';
 
 import { execFileSync, execSync } from 'child_process'
@@ -9,12 +9,14 @@ import { expandRegionWithRegexp } from './editorUtils'
 
 
 // the convenience functions are the things that change most and should
-// be easiest to discover. Pull core funcitonality out
+// be easiest to discover. Pull core funcitonality out, keep convenience
+// functions in
 
 
 import { formatObj } from './format'
 import { Scope } from './scope'
 import { History } from './history'
+import { PrivateApp, DataviewPlugin } from "./types"
 
 
 import { fuzzySelect } from './fuzzy'
@@ -23,6 +25,7 @@ import { promptCommand } from './promptCommand'
 import { popup } from './popup'
 import { openSetting } from './settings'
 import { templater_expand } from './templater'
+
 
 
 export default class ReplPlugin extends Plugin {
@@ -113,8 +116,15 @@ export default class ReplPlugin extends Plugin {
         this.scope.add("path", path)
 
         this.scope.add("frontmatter", frontmatter)
-        //@ts-ignore
-        let vaultPath = this.app.vault.adapter.basePath
+
+        let vaultPath
+        if (this.app.vault.adapter instanceof FileSystemAdapter) {
+            const adapter = this.app.vault.adapter as FileSystemAdapter
+            vaultPath = adapter.getBasePath()
+        } else {
+            vaultPath = undefined
+        }
+
         this.scope.add("vaultPath", vaultPath)
 
         this.addToScopeWithDoc(
@@ -306,8 +316,8 @@ export default class ReplPlugin extends Plugin {
 
     makeNewCommand() {
         const plugin = this
-        function newCommand(f: any) {
-            let commandName = f.name.replaceAll("_", " ")
+        function newCommand(f: () => void): (() => void) {
+            let commandName = f.name.replace("/_/g", " ")
             plugin.addCommand({
                 id: f.name,
                 name: commandName,
@@ -326,14 +336,17 @@ export default class ReplPlugin extends Plugin {
         return newCommand
     }
 
-    makeSource(app: any) {
+    makeSource(app: App) {
         const plugin = this
         async function source(name: string) {
             plugin.updateScopeApp()
             const path = name + ".md"
-            const file: string = await app.vault.getAbstractFileByPath(path)
-            const contents = await app.vault.read(file)
-            plugin.scope.eval(contents)
+            const file = app.vault.getFileByPath(path)
+
+            if (file !== null) {
+                const contents = await app.vault.read(file)
+                plugin.scope.eval(contents)
+            }
         }
         return source
     }
@@ -383,12 +396,12 @@ export default class ReplPlugin extends Plugin {
     }
 }
 
-async function openFile(app: any, name: string) {
+async function openFile(app: App, name: string) {
     await app.workspace.openLinkText(name)
 }
 
-function plugin(app: any, name: string) {
-    return app.plugins.plugins[name]
+function plugin(app: PrivateApp, name: string) {
+    return app.plugins.getPlugin(name)
 }
 
 function runProc(commandAndArgs: string | Array<string>, input?: string): string {
@@ -406,7 +419,7 @@ function runProc(commandAndArgs: string | Array<string>, input?: string): string
     }
 }
 
-function dir(obj: any) {
+function dir(obj: Object) {
     const p = [];
     for (; obj != null; obj = Object.getPrototypeOf(obj)) {
         const op = Object.getOwnPropertyNames(obj);
@@ -417,7 +430,7 @@ function dir(obj: any) {
     return p;
 }
 
-function fuzzyDir(app: App, obj: any) {
+function fuzzyDir(app: App, obj: Object) {
     return fuzzySelect(app, dir(obj))
 }
 
@@ -425,7 +438,7 @@ function message(s: string) {
     new Notice(s)
 }
 
-function command(app: any, id: string) {
+function command(app: PrivateApp, id: string) {
     app.commands.executeCommandById(id)
 }
 
@@ -438,37 +451,37 @@ function selection(editor: Editor) {
     return selection
 }
 
-function readFile(app: any, name: string) {
-    name = name + ".md"
-    const file = app.vault.getAbstractFileByPath(name)
-    return app.vault.read(file)
+function readFile(app: App, name: string) {
+    const path = name + ".md"
+    const file = app.vault.getFileByPath(path)
+    if (file !== null) {
+        return app.vault.read(file)
+    } else {
+        throw Error(`${path} does not exist`)
+    }
 }
 
-async function writeFile(app: any, name: string, text: string) {
+async function writeFile(app: App, name: string, text: string) {
     name = name + ".md"
     let file: TFile
-    if (await app.vault.exists(name)) {
-        file = await app.vault.getAbstractFileByPath(name)
-    } else {
+    file = await app.vault.getFileByPath(name)!
+    if (file === null) {
         file = await app.vault.create(name, "")
     }
     return await app.vault.process(file, (_: string) => text)
 }
 
-async function appendToFile(app: any, name: string, appended: string) {
-    let existing
-    if (!await app.vault.exists(name + ".md")) {
-        existing = ""
+async function appendToFile(app: App, name: string, appended: string) {
+    let file = await app.vault.getFileByPath(name)!
+    if (file === undefined) {
+        return await writeFile(app, name, appended)
     } else {
-        existing = await readFile(app, name)
+        return await app.vault.append(file, appended)
     }
-
-    const content = existing + appended
-    await writeFile(app, name, content)
 }
 
-function getDv(app: App) {
-    const p = plugin(app, "dataview")
+function getDv(app: PrivateApp) {
+    const p = plugin(app, "dataview") as DataviewPlugin
     if (p === undefined) {
         throw new Error("dataview plugin is missing. Is it installed?")
     }
@@ -538,7 +551,7 @@ function mark(editor: Editor) {
     return editor.getCursor("from")
 }
 
-function endOfLine(editor: any) {
+function endOfLine(editor: Editor) {
     const cursor = editor.getCursor()
     const line = editor.getLine(cursor.line)
     editor.setCursor(cursor.line, line.length)
@@ -599,6 +612,6 @@ function functions(plugin: ReplPlugin, app: App) {
 }
 
 
-function commands(app: any) {
+function commands(app: PrivateApp) {
     return app.commands.listCommands().map((x: Command) => x.id)
 }

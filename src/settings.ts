@@ -1,5 +1,7 @@
+import { PrivateApp } from './types'
 
-export async function openSetting(app: any, name: string) {
+
+export async function openSetting(app: PrivateApp, name: string) {
     function findTab(app: any, name: string): any {
         let result = undefined;
 
