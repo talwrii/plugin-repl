@@ -3,8 +3,8 @@ import {
     MarkdownPostProcessorContext, Command
 } from 'obsidian';
 
-import { execFileSync } from 'child_process'
-import { parse as shellParse } from 'shell-quote';
+import { execFileSync, execSync } from 'child_process'
+import { parse as shellParse, quote as shellQuote } from 'shell-quote';
 import { expandRegionWithRegexp } from './editorUtils'
 
 
@@ -22,6 +22,7 @@ import { promptString } from './prompt'
 import { promptCommand } from './promptCommand'
 import { popup } from './popup'
 import { openSetting } from './settings'
+import { templater_expand } from './templater'
 
 
 export default class ReplPlugin extends Plugin {
@@ -102,10 +103,15 @@ export default class ReplPlugin extends Plugin {
     }
 
     updateScopeApp() {
-        let path = this.app.workspace.getLeaf().view.path
-        this.scope.add("repl", this)
         // @ts-ignore path does exist
+        let path = this.app.workspace.getLeaf().view.path
+        // @ts-ignore
+        let frontmatter = this.app.metadataCache.getFileCache(this.app.workspace.getLeaf().view.file)["frontmatter"]
+
+        this.scope.add("repl", this)
         this.scope.add("path", path)
+
+        this.scope.add("frontmatter", frontmatter)
         //@ts-ignore
         let vaultPath = this.app.vault.adapter.basePath
         this.scope.add("vaultPath", vaultPath)
@@ -153,7 +159,7 @@ export default class ReplPlugin extends Plugin {
         )
         this.addToScopeWithDoc(
             "runProc", runProc,
-            "(s: string) or (['prog', 'arg1', 'args2']) run a program and return its output"
+            "(s: string) or (['prog', 'arg1', 'args2']) run a program and return its output. To send "
         )
         this.addToScopeWithDoc(
             "newCommand", this.makeNewCommand(),
@@ -195,11 +201,6 @@ export default class ReplPlugin extends Plugin {
         )
 
         this.addToScopeWithDoc(
-            "getDv", getDv.bind(null, this.app),
-            "Get hold of the dataview object for querying pages"
-
-        )
-        this.addToScopeWithDoc(
             "message", message,
             "(msg: string) Popup a message with a notification message msg"
         )
@@ -216,6 +217,17 @@ export default class ReplPlugin extends Plugin {
             "openUrl", openUrl,
             "(url: string) Open this url in a browser "
         )
+
+
+        this.addToScopeWithDoc(
+            "getDv", getDv.bind(null, this.app),
+            "Get hold of the dataview object for querying pages"
+        )
+        this.addToScopeWithDoc(
+            "templater_expand", templater_expand.bind(null, this.app),
+            "If templater is installed, expand the templater string and return the result."
+        )
+
     }
 
     updateScopeEditor(editor: Editor, view: MarkdownView) {
@@ -269,6 +281,10 @@ export default class ReplPlugin extends Plugin {
             "Returns the cursor positoin at the beginning of the note"
         )
         this.addToScopeWithDoc(
+            "jump", jump.bind(null, editor),
+            "Jump to the given point."
+        )
+        this.addToScopeWithDoc(
             "selection", selection.bind(null, editor),
             "Returns the text of the selection."
         )
@@ -290,13 +306,18 @@ export default class ReplPlugin extends Plugin {
     makeNewCommand() {
         const plugin = this
         function newCommand(f: any) {
+            let commandName = f.name.replaceAll("_", " ")
             plugin.addCommand({
                 id: f.name,
-                name: f.name.replaceAll("_", " "),
+                name: commandName,
                 editorCallback: (editor: Editor, view: MarkdownView) => {
                     plugin.updateScopeApp()
                     plugin.updateScopeEditor(editor, view)
-                    plugin.scope.run(f)
+                    try {
+                        plugin.scope.run(f)
+                    } catch (e) {
+                        message(`${commandName} failed: ${e.message}`)
+                    }
                 }
             });
             return f
@@ -361,21 +382,27 @@ export default class ReplPlugin extends Plugin {
     }
 }
 
-function openFile(app: any, name: string) {
-    app.workspace.openLinkText(name)
+async function openFile(app: any, name: string) {
+    await app.workspace.openLinkText(name)
 }
 
 function plugin(app: any, name: string) {
     return app.plugins.plugins[name]
 }
 
-function runProc(commandAndArgs: string | Array<string>): string {
+function runProc(commandAndArgs: string | Array<string>, input?: string): string {
     if (typeof commandAndArgs === "string") {
         const command = shellParse(commandAndArgs) as string[]
-        return runProc(command)
+        return runProc(command, input)
     }
-    const [command, ...args] = commandAndArgs
-    return execFileSync(command, args).toString()
+
+    if (input == undefined) {
+        const [command, ...args] = commandAndArgs
+        return execFileSync(command, args).toString()
+    } else {
+        let quoted = shellQuote(commandAndArgs)
+        return execSync(quoted, { input: input }).toString()
+    }
 }
 
 function dir(obj: any) {
@@ -407,9 +434,6 @@ function lineAtPoint(editor: Editor) {
 
 function selection(editor: Editor) {
     const selection = editor.getSelection()
-    if (selection === "") {
-        throw Error("No text is selected")
-    }
     return selection
 }
 
@@ -491,6 +515,10 @@ function pointMax(editor: Editor) {
     const lastLine = editor.lastLine()
     const lastChar = editor.getLine(lastLine).length
     return { line: lastLine, ch: lastChar }
+}
+
+function jump(editor: Editor, position: EditorPosition) {
+    return editor.setCursor(position)
 }
 
 function pointMin(): EditorPosition {

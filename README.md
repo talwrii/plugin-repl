@@ -79,6 +79,7 @@ Various convenience functions are provided:
 * `mark()` - Return the cursor position at the  beginning of the selection
 * `pointMin()` - Return the minimum cursor in the buffer
 * `pointMax()` - Return the maximun cursor in the buffer
+* `jump(p: CursorPoint)` - Jump to this point
 * `forwardChar(count?: number)` - Move count (or one) character forward
 * `selection()` - Get the text contained in the selection
 
@@ -164,6 +165,26 @@ The following code returns the first list of the page called `templates/daily.md
 dv = getDv()
 dv.pages().filter((x) => x.file.path == "templates/daily.md")[0].file.lists[0]
 ```
+
+## Templater support
+The [Templater](https://github.com/SilentVoid13/Templater) provides functionality to insert javascript. If you have installed Templater you can use
+the async `templater_expand` function to expand template strings.
+
+This creates a command that inserts a files tags using a template.
+```
+newCommand(async function templater_example() {
+    insert(await templater_expand("The files tags: <% tp.file.tags %>"))
+})
+```
+
+If you want to expand a template for a file you can use `readFile`
+
+```
+newCommand(async function templater_from_file() {
+    insert(await templater_expand(await readFile("myTemplate")))
+})
+```
+
 
 ## Importing modules
 Modules in Obsidian work in an interesting way that makes installing from NPM a little tricky. There is a [technical explanation here](https://github.com/talwrii/plugin-repl-imports#technical).
