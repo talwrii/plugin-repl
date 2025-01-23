@@ -119,8 +119,7 @@ export default class ReplPlugin extends Plugin {
 
         let vaultPath
         if (this.app.vault.adapter instanceof FileSystemAdapter) {
-            const adapter = this.app.vault.adapter as FileSystemAdapter
-            vaultPath = adapter.getBasePath()
+            vaultPath = this.app.vault.adapter.getBasePath()
         } else {
             vaultPath = undefined
         }
