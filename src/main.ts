@@ -6,11 +6,11 @@ import {
 import { execFileSync, execSync } from 'child_process'
 import { parse as shellParse, quote as shellQuote } from 'shell-quote';
 import { expandRegionWithRegexp } from './editorUtils'
+import { jump, forwardChar, point, pointMax, pointMin, lineNumber, mark, endOfLine, endOfLinePoint, atEndOfBuffer } from './bufferMotion'
+import { forwardRegexp, atRegexp } from './regexpMotion'
+import { bufferString, restOfLine } from './bufferData'
 
 
-// the convenience functions are the things that change most and should
-// be easiest to discover. Pull core funcitonality out, keep convenience
-// functions in
 
 
 import { formatObj } from './format'
@@ -250,6 +250,10 @@ export default class ReplPlugin extends Plugin {
             "Go the end of the line"
         )
         this.addToScopeWithDoc(
+            "endOfLinePoint", endOfLinePoint.bind(null, editor),
+            "Return the point a the end of the line."
+        )
+        this.addToScopeWithDoc(
             "lineNumber", lineNumber.bind(null, editor),
             "Return the current line number"
         )
@@ -261,6 +265,11 @@ export default class ReplPlugin extends Plugin {
             "point", point.bind(null, editor),
             "Return the current cursor position"
         )
+        this.addToScopeWithDoc(
+            "atEndOfBuffer", atEndOfBuffer.bind(null, editor),
+            "Return true if the cursor is at the end of the buffer."
+        )
+
         this.addToScopeWithDoc(
             "mark", mark.bind(null, editor),
             "Return the cursor at the beginning of the current selection"
@@ -463,7 +472,7 @@ function readFile(app: App, name: string) {
 async function writeFile(app: App, name: string, text: string) {
     name = name + ".md"
     let file: TFile
-    file = await app.vault.getFileByPath(name)!
+    file = app.vault.getFileByPath(name)!
     if (file === null) {
         file = await app.vault.create(name, "")
     }
@@ -485,16 +494,6 @@ function getDv(app: PrivateApp) {
         throw new Error("dataview plugin is missing. Is it installed?")
     }
     return p.localApi()
-}
-
-function forwardChar(editor: Editor, count: number | undefined): void {
-    if (count === undefined) {
-        count = 1
-    }
-
-    const cursor = editor.getCursor()
-    cursor.ch += count
-    editor.setCursor(cursor)
 }
 
 function insert(editor: Editor, s: string) {
@@ -524,41 +523,13 @@ function kill(editor: Editor, pos1?: EditorPosition, pos2?: EditorPosition) {
     editor.replaceRange("", a, b)
 }
 
-function pointMax(editor: Editor) {
-    const lastLine = editor.lastLine()
-    const lastChar = editor.getLine(lastLine).length
-    return { line: lastLine, ch: lastChar }
-}
 
-function jump(editor: Editor, position: EditorPosition) {
-    return editor.setCursor(position)
-}
 
-function pointMin(): EditorPosition {
-    return { line: 0, ch: 0 }
-}
 
-function lineNumber(editor: Editor): number {
-    return editor.getCursor().line
-}
 
-function point(editor: Editor): EditorPosition {
-    return editor.getCursor("to")
-}
 
-function mark(editor: Editor) {
-    return editor.getCursor("from")
-}
 
-function endOfLine(editor: Editor) {
-    const cursor = editor.getCursor()
-    const line = editor.getLine(cursor.line)
-    editor.setCursor(cursor.line, line.length)
-}
 
-function bufferString(editor: Editor, start?: EditorPosition, end?: EditorPosition) {
-    return editor.getRange(start || pointMin(), end || pointMax(editor))
-}
 
 function openUrl(url: string) {
     window.open(url) // returns null for some reason
@@ -596,21 +567,19 @@ function replRequire(vaultPath: string, name: string) {
     return mod.packages[name]
 }
 
+function functions(plugin: ReplPlugin, app: App) {
+    fuzzySelect(app, plugin.function_docs)
+}
 
-function renderCodeBlock(plugin: ReplPlugin, source: string, el: HTMLElement, ctx: MarkdownPostProcessorContext) {
+function commands(app: PrivateApp) {
+    return app.commands.listCommands().map((x: Command) => x.id)
+}
+
+export function renderCodeBlock(plugin: ReplPlugin, source: string, el: HTMLElement, ctx: MarkdownPostProcessorContext) {
     try {
         plugin.runInCodeBlock(el, source)
     } catch (e) {
         el.appendText(e.message)
         el.appendText(e.stack)
     }
-}
-
-function functions(plugin: ReplPlugin, app: App) {
-    fuzzySelect(app, plugin.function_docs)
-}
-
-
-function commands(app: PrivateApp) {
-    return app.commands.listCommands().map((x: Command) => x.id)
 }
