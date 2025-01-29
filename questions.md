@@ -35,3 +35,6 @@ Dataview and Templater have both been "stretched" to do interesting things.
 Dataview is nominally a query language for your pages - but people have added Javascript to it; it has access to an app object; and it has the ability to render arbitrary JavaScript. Templater was initially intended do templating, but there is a "start up template" that does not render and people use templates to run code.
 
 The difference between these three is how the code is run and what is made easy.  Plugin REPL is good if you just want to run some code now, once. It is good if you want to define commands and bind them to keys. It is good if you want to debug and adapt code. It is good if you want to do straight forward things in the editor. Dataview is good if you want some code in a page that renders something as part of the page itself. Templater is good if you want templates.
+
+# How can you use Plugin Repl to develop plugins
+When I'm developing a plugin, I tend to work on a single function (and the functions needed for this function in Obsidian). I get the function working with Plugin REPL, and once it is done I will move into a plugin, fix up the code and reload Obsidian.

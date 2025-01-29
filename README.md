@@ -79,8 +79,12 @@ Various convenience functions are provided:
 * `mark()` - Return the cursor position at the  beginning of the selection
 * `pointMin()` - Return the minimum cursor in the buffer
 * `pointMax()` - Return the maximun cursor in the buffer
+* `atEndOfBuffer()` - Return true if the cursor is at the end of the buffer.
 * `jump(p: CursorPoint)` - Jump to this point
 * `forwardChar(count?: number)` - Move count (or one) character forward
+* `endOfLine()` - Move to the end of the line
+
+
 * `selection()` - Get the text contained in the selection
 
 * `bufferString()` - Return a string containing the entire text of the buffer
