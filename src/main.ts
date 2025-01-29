@@ -11,8 +11,6 @@ import { forwardRegexp, atRegexp } from './regexpMotion'
 import { bufferString, restOfLine } from './bufferData'
 
 
-
-
 import { formatObj } from './format'
 import { Scope } from './scope'
 import { History } from './history'
@@ -114,7 +112,6 @@ export default class ReplPlugin extends Plugin {
 
         this.scope.add("repl", this)
         this.scope.add("path", path)
-
         this.scope.add("frontmatter", frontmatter)
 
         let vaultPath
@@ -241,6 +238,13 @@ export default class ReplPlugin extends Plugin {
     }
 
     updateScopeEditor(editor: Editor, view: MarkdownView) {
+        const title = view.titleEl.textContent
+
+        this.addToScopeWithDoc(
+            "title", title,
+            "title of the current note"
+        )
+
         this.addToScopeWithDoc(
             "popup", popup.bind(null, this.app, editor),
             "(message: string) Open a popup showing a message"
@@ -325,7 +329,7 @@ export default class ReplPlugin extends Plugin {
     makeNewCommand() {
         const plugin = this
         function newCommand(f: () => void): (() => void) {
-            let commandName = f.name.replace("/_/g", " ")
+            const commandName = f.name.replace("/_/g", " ")
             plugin.addCommand({
                 id: f.name,
                 name: commandName,
