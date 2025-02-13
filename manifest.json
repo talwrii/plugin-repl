@@ -1,7 +1,7 @@
 {
 	"id": "plugin-repl",
 	"name": "Plugin REPL",
-	"version": "1.0.3",
+	"version": "1.0.4",
 	"minAppVersion": "0.15.0",
 	"description": "Provide an emacs-like read evaluate print loop to prototype plugins and do easy scripting",
 	"author": "@readwithai",
