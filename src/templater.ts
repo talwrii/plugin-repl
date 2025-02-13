@@ -43,7 +43,7 @@ export async function templater_expand(app: PrivateApp, template: string) {
 
 export async function getTp(app: PrivateApp) {
     let path = this.app.workspace.getLeaf().view.path
-    let p = app.plugins.getPlugin("templater-obsidian") as any
+    let p = app.plugins.getPlugin("templater-obsidian") as TemplaterPlugin
     if (p === undefined) {
         new Error("Templater must be installed")
     }
