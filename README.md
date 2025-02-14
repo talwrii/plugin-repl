@@ -198,12 +198,14 @@ Modules in Obsidian work in an interesting way that makes installing from NPM a 
 
 There is a system to provide imports to Plugin REPL provided by [this repository](https://github.com/talwrii/plugin-repl-imports). To use it, you have to checkout a repository into your vault, update a text file, run a make command and then you can use the `replRequire` function within Obsidian, as described in the [docs](https://github.com/talwrii/plugin-repl-imports).
 
-## Some questions and answers about plugin repl
+## Some questions and answers about Plugin REPL
 [Questions and answers](questions.md)
 
 ## Alternatives and prior work
 * You can [use plugins](https://docs.obsidian.md/Plugins/Getting+started/Build+a+plugin) to do the same things that you can do with Plugin REPL but this tends to mean more code.
 * [js-engine](https://github.com/mProjectsCode/obsidian-js-engine-plugin) lets you evaulate JavaScript code in code blocks. [Execute code](https://github.com/twibiral/obsidian-execute-code) gives you code blocks in multiple programming languages. Neither give you access to Obsidian API objects to let you do scripting.
+* [js-engine](https://github.com/mProjectsCode/obsidian-js-engine-plugin) lets you evaulate JavaScript code in code blocks. [Execute code](https://github.com/twibiral/obsidian-execute-code) gives you code blocks in multiple programming languages. Neither give you access to Obsidian api objects to let you do scripting.
+>>>>>>> c91665f (tweak readme)
 * [dataview](https://blacksmithgu.github.io/obsidian-dataview/) similarly lets you execute JavaScript in code blocks.  It gives you access to the `app` object.
 * [Templater](https://github.com/SilentVoid13/Templater) defines a template language with JavaScript code blocks. It's API gives you access to the `app` object and people have used "Templates" that when run script Obsidian.
 
@@ -223,9 +225,15 @@ This plugin is highly influenced by [Emacs](https://www.gnu.org/software/emacs/)
 This code exposes and wraps the [Obsidian plugin API](https://docs.obsidian.md/Plugins/Getting+started/Build+a+plugin) - as all plugins do - but Plugin REPL does this in a rather more direct / turing-complete way.
 
 ## About me
+<<<<<<< HEAD
 
 *I make productivity tools and AI tools related to reading and research.*
 *If that sounds interesting you can follow me on <a href="https://x.com/readwithai">twitter</a> or <a href="https://bsky.app/profile/readwithai.bsky.social">bluesky</a>.*
+=======
+I make productivity tools and AI tools related to reading and research.
+
+If that sounds interesting you can follow me on <a href="https://x.com/readwithai">twitter</a> or <a href="https://bsky.app/profile/readwithai.bsky.social">bluesky</a>.
+>>>>>>> c91665f (tweak readme)
 
 *I write about these topics on <a href="https://readwithai.substack.com/readwithai">substack</a>.*
 
