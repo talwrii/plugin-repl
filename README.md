@@ -1,5 +1,5 @@
 # Plugin repl - In-editor Scripting and Rapid Plugin Development
-[@readwithai](https://x.com/readwithai) ([🦋](https://bsky.app/profile/readwithai.bsky.social), [𝕏](https://x.com/readwithai), [blog](https://readwithai.substack.com/), [▶️](https://www.youtube.com/@readerai/shorts), [support](https:://ko-fi.com/readwithai), [Plugin REPL docs](https://readwithai.substack.com/p/obsidian-plugin-repl))
+[@readwithai](https://x.com/readwithai) ([Install](https://obsidian.md/plugins?id=plugin-repl), [🦋](https://bsky.app/profile/readwithai.bsky.social), [𝕏](https://x.com/readwithai), [blog](https://readwithai.substack.com/), [▶️](https://www.youtube.com/@readerai/shorts), [support](https:://ko-fi.com/readwithai), [Plugin REPL docs](https://readwithai.substack.com/p/obsidian-plugin-repl))
 
 Rapidly automate tasks from within notes. Test code for plugins without having to reload.
 
