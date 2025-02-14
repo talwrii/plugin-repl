@@ -98,7 +98,7 @@ Various convenience functions are provided:
 * `lineAtPoint(p?:string)` - Retunrs the line at the cursor position. Default to current positiong.
 
 ### Reading and files
-* `await readFile(name: string) - Read the markup file with the title name.
+* `await readFile(name: string)` - Read the markup file with the title name.
 * `await writeFile(name: string)` - Overwrite the markdown file with the title name with the given string
 * `await appendToFile(name: string)` - Append the given string to the markdown with the title `name`
 ### Processes
