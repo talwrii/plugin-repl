@@ -17,6 +17,10 @@ A range of convenience functions, partly inspired by emacs, is also provided to 
 ![demo](demo.gif)
 
 # Installation
+Plugin REPL is available from within Obsidian as a [community plugin](https://obsidian.md/plugins?id=plugin-repl).
+
+Alternatively, you can manually install Plugin REPL:
+
 In your vault, there should be a `.obsidian/plugins` directory. You can clone this repo into that
 directory and then run the following to build the plugin:
 
