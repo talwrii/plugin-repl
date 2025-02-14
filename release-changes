@@ -1,0 +1,23 @@
+#!/usr/bin/python3
+
+# Versions is a file that contains versions.json
+# llm context: versions.json
+# I want to get the last version and then so the git commits since this version
+# Call git log with an exec call so that this process becomes a git process
+# The versions are git tags
+
+
+import subprocess
+import re
+
+# Get git tags that look like \d+.\d+.\d+ using git
+*_, last_version = sorted([x for x in subprocess.check_output(["git", "tag"]).decode('utf8').splitlines() if re.match(r"\d+.\d+.\d+", x)])
+
+
+# Get the commit hash from the last version
+commit_hash = subprocess.check_output(['git', 'rev-list', '-n', '1', last_version]).decode('utf-8').strip()
+
+# Get the git commits since the last version
+git_log = subprocess.check_output(['git', 'log', '{}..HEAD'.format(commit_hash)]).decode('utf-8')
+
+print(git_log)
