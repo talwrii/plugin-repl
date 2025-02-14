@@ -3,3 +3,4 @@
 1.0.4 Linting and improve readme
 1.0.5 Fix linting errors and improve release script
 1.1.0 Automate release process
+1.1.1 Get release process to check if there are uncommited changes

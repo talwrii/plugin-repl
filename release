@@ -1,0 +1,94 @@
+#!/usr/bin/python3
+
+
+import argparse
+import subprocess
+import json
+
+# llm command:manifest file: cat manifest.json
+# Read the version number from the manifest file
+
+
+# llm global: python
+
+# run: npm run build
+subprocess.check_call(["npm", "run", "build"])
+
+subprocess.check_call(["git", "fetch"])
+
+subprocess.check_output(["git", "merge-base", "--is-ancestor", "origin/master", "master"])
+
+
+with open("manifest.json") as manifest_file:
+    manifest = json.load(manifest_file)
+    version_number = manifest["version"]
+
+# llm command:versions.json file: cat versions.json
+with open("versions.json") as stream:
+    data = json.loads(stream.read())
+
+# Make sure version_number is in versions.json
+if version_number not in data:
+    print(f"Version {version_number} not found in versions.json. Aborting release process.")
+    exit(1)
+
+
+# cat out the change log
+# There is a global change log called "changelog" in this directory
+with open("changelog") as changelog_file:
+    changelog_content = changelog_file.read()
+
+changelog_lines = changelog_content.splitlines()
+
+
+# Make sure there are no changes using
+# git diff --exit-code
+subprocess.check_call(["git", "diff", "--exit-code"])
+
+# Get the description for the changelog file
+# 1. save it in a variable called release_summary
+# 2. raise an exception "Add summary to checklist" if you can't find the description
+for line in changelog_lines:
+    if line.startswith(version_number):
+        release_summary = line.strip()
+        break
+else:
+    raise Exception("Add summary to changelog")
+
+
+# llm: start
+# llm command:man page for git tag: man git-tag
+# Tag the current release with git
+# use subprocess.check_call and full flags rather than single letter flags
+# do not use single letter flags. E.g -a should be expanded to --annotate
+output = subprocess.check_call(["git", "tag", "--annotate", "--message", release_summary, version_number])
+# llm: end
+
+# Push the tag
+output = subprocess.check_call(["git", "push", "origin", version_number])
+
+# llm: start
+# llm command:man page for gh:man gh-release-create
+# Create a release wit the gh command line tool
+# Use the line from the change log  as the message
+# Use full commands
+output = subprocess.check_call(["gh", "release", "create", version_number, "--notes-from-tag"])
+# llm: end
+
+
+# llm: start
+# llm command: details of the last release: gh release view 1.0.3
+# llm command: man page for gh release upload: man gh-release-upload
+# Upload files to the release using gh
+# Look at the output of gh release view to determine which files to use
+
+
+# llm command: subprocess man page: python3 -m pydoc subprocess | grep shell
+
+command = f"gh release upload {version_number} main.js manifest.json"
+print("Running:", command)
+subprocess.check_call(
+    command,
+    shell=True)
+
+# llm: end
