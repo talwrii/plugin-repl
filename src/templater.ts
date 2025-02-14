@@ -50,7 +50,7 @@ export async function getTp(app: PrivateApp) {
 
     const running_config = p.templater.create_running_config(
         "plugin-repl",
-        app.vault.getFileByPath(path),
+        app.vault.getFileByPath(path)!,
         1
     );
     const functions_object = await p.templater.functions_generator.generate_object(
