@@ -24,6 +24,9 @@ import { popup } from './popup'
 import { openSetting } from './settings'
 import { templater_expand } from './templater'
 
+interface PrivateMarkdownView extends MarkdownView {
+    titleEl: HTMLElement
+}
 
 
 export default class ReplPlugin extends Plugin {
@@ -38,7 +41,7 @@ export default class ReplPlugin extends Plugin {
         this.scope.eval(input)
     }
 
-    runCommand(editor: Editor, view: MarkdownView, region: string) {
+    runCommand(editor: Editor, view: PrivateMarkdownView, region: string) {
         let output: string = "";
 
         this.updateScopeApp()
@@ -237,7 +240,7 @@ export default class ReplPlugin extends Plugin {
 
     }
 
-    updateScopeEditor(editor: Editor, view: MarkdownView) {
+    updateScopeEditor(editor: Editor, view: PrivateMarkdownView) {
         const title = view.titleEl.textContent
 
         this.addToScopeWithDoc(
@@ -335,7 +338,7 @@ export default class ReplPlugin extends Plugin {
                 name: commandName,
                 editorCallback: (editor: Editor, view: MarkdownView) => {
                     plugin.updateScopeApp()
-                    plugin.updateScopeEditor(editor, view)
+                    plugin.updateScopeEditor(editor, view as PrivateMarkdownView)
                     try {
                         plugin.scope.run(f)
                     } catch (e) {
@@ -372,7 +375,7 @@ export default class ReplPlugin extends Plugin {
                     const cursor = editor.getCursor()
                     const region = editor.getSelection() || editor.getLine(cursor.line)
 
-                    const output = this.runCommand(editor, view, region)
+                    const output = this.runCommand(editor, view as PrivateMarkdownView, region)
 
                     if (editor.getCursor().line == editor.lastLine()) {
                         editor.replaceRange("\n", editor.getCursor())
@@ -393,7 +396,7 @@ export default class ReplPlugin extends Plugin {
             editorCallback: (editor: Editor, view: MarkdownView) => {
                 const cursor = editor.getCursor()
                 const region = editor.getSelection() || editor.getLine(cursor.line)
-                this.runCommand(editor, view, region)
+                this.runCommand(editor, view as PrivateMarkdownView, region)
             }
         });
 
@@ -402,7 +405,7 @@ export default class ReplPlugin extends Plugin {
             name: 'Read some JavaScript and run it (result shown as Notification)',
             editorCallback: async (editor: Editor, view: MarkdownView) => {
                 const command = await promptCommand(this.app, this.history, editor)
-                message(this.runCommand(editor, view, command))
+                message(this.runCommand(editor, view as PrivateMarkdownView, command))
             }
         });
     }
