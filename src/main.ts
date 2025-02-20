@@ -545,7 +545,8 @@ function openUrl(url: string) {
 
 function wordAtPoint(editor: Editor) {
     const pos = editor.getCursor()
-    const [start, end] = expandRegionWithRegexp(editor, /\w/, pos, { ...pos, ch: pos.ch + 1 })
+    // Randomly guess word charactrs for a few languages (danish, french, english, german)
+    const [start, end] = expandRegionWithRegexp(editor, /(\w|[åæøÅÆØéèüäöë])/, pos, { ...pos, ch: pos.ch + 1 })
     const line = editor.getLine(pos.line)
     return line.slice(start.ch, end.ch)
 }

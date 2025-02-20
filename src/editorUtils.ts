@@ -10,7 +10,7 @@ export function expandRegionWithRegexp(editor: Editor, regexp: RegExp, start: Ed
     while (startChar >= 1 && regexp.test(line[startChar - 1])) {
         startChar -= 1
     }
-    while (endChar < line.length - 1 && regexp.test(line[endChar])) {
+    while (endChar < line.length + 1 && regexp.test(line[endChar])) {
         endChar += 1
     }
     return [{ ...start, ch: startChar }, { ...end, ch: endChar }]
