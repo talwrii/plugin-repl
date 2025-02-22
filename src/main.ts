@@ -332,7 +332,7 @@ export default class ReplPlugin extends Plugin {
     makeNewCommand() {
         const plugin = this
         function newCommand(f: () => void): (() => void) {
-            const commandName = f.name.replace("/_/g", " ")
+            const commandName = f.name.replace(/_/g, " ")
             plugin.addCommand({
                 id: f.name,
                 name: commandName,
