@@ -466,11 +466,11 @@ function selection(editor: Editor) {
     return selection
 }
 
-function readFile(app: App, name: string) {
+async function readFile(app: App, name: string) {
     const path = name + ".md"
     const file = app.vault.getFileByPath(path)
     if (file !== null) {
-        return app.vault.read(file)
+        return await app.vault.read(file)
     } else {
         throw Error(`${path} does not exist`)
     }
