@@ -205,9 +205,9 @@ There is a system to provide imports to Plugin REPL provided by [this repository
 * You can [use plugins](https://docs.obsidian.md/Plugins/Getting+started/Build+a+plugin) to do the same things that you can do with Plugin REPL but this tends to mean more code.
 * [js-engine](https://github.com/mProjectsCode/obsidian-js-engine-plugin) lets you evaulate JavaScript code in code blocks. [Execute code](https://github.com/twibiral/obsidian-execute-code) gives you code blocks in multiple programming languages. Neither give you access to Obsidian API objects to let you do scripting.
 * [js-engine](https://github.com/mProjectsCode/obsidian-js-engine-plugin) lets you evaulate JavaScript code in code blocks. [Execute code](https://github.com/twibiral/obsidian-execute-code) gives you code blocks in multiple programming languages. Neither give you access to Obsidian api objects to let you do scripting.
->>>>>>> c91665f (tweak readme)
 * [dataview](https://blacksmithgu.github.io/obsidian-dataview/) similarly lets you execute JavaScript in code blocks.  It gives you access to the `app` object.
 * [Templater](https://github.com/SilentVoid13/Templater) defines a template language with JavaScript code blocks. It's API gives you access to the `app` object and people have used "Templates" that when run script Obsidian.
+* [Obsidian runjs](https://github.com/eoureo/obsidian-runjs) is quite similar in that it allows you to run code from within Obsidian. There is a special syntax for blocks that then show up in a side bar. Plugin REPL is easier to use in my opinion since you can just run code and use the command interface.
 
 Many plugins can create commands at run time from within Obsidian - but they tend to be for more specific uses. I was influenced by [obsidian-open-settings](https://github.com/Mara-Li/obsidian-open-settings) for this, as well as for the `openSettings` command.
 
