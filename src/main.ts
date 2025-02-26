@@ -290,6 +290,10 @@ export default class ReplPlugin extends Plugin {
             "(start: Position, end: Position) Delete the region between start and end"
         )
         this.addToScopeWithDoc(
+            "killLine", killLine.bind(null, editor),
+            "Delete the current line"
+        )
+        this.addToScopeWithDoc(
             "lineAtPoint", lineAtPoint.bind(null, editor),
             "Return the content of the line where the cursor is. Optionally takes a cursor position as an argument"
         )
@@ -528,6 +532,13 @@ function kill(editor: Editor, pos1?: EditorPosition, pos2?: EditorPosition) {
 
     const [a, b] = [pos1, pos2].sort(cmpCursor)
     editor.replaceRange("", a, b)
+}
+
+
+function killLine(editor: Editor) {
+    const cursor = editor.getCursor()
+    const line = editor.getLine(cursor.line)
+    editor.replaceRange("", { ...cursor, ch: 0 }, { ...cursor, ch: line.length })
 }
 
 
