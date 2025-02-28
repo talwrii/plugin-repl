@@ -225,16 +225,11 @@ This plugin is highly influenced by [Emacs](https://www.gnu.org/software/emacs/)
 This code exposes and wraps the [Obsidian plugin API](https://docs.obsidian.md/Plugins/Getting+started/Build+a+plugin) - as all plugins do - but Plugin REPL does this in a rather more direct / turing-complete way.
 
 ## About me
-<<<<<<< HEAD
 
-*I make productivity tools and AI tools related to reading and research.*
-*If that sounds interesting you can follow me on <a href="https://x.com/readwithai">twitter</a> or <a href="https://bsky.app/profile/readwithai.bsky.social">bluesky</a>.*
-=======
 I make productivity tools and AI tools related to reading and research.
 
-If that sounds interesting you can follow me on <a href="https://x.com/readwithai">twitter</a> or <a href="https://bsky.app/profile/readwithai.bsky.social">bluesky</a>.
->>>>>>> c91665f (tweak readme)
 
-*I write about these topics on <a href="https://readwithai.substack.com/readwithai">substack</a>.*
+If that sounds interesting you can follow me on <a href="https://x.com/readwithai">twitter</a> or <a href="https://bsky.app/profile/readwithai.bsky.social">bluesky</a>.  I also write about these topics on <a href="https://readwithai.substack.com/readwithai">substack</a>.
 
-*If you find **this** piece of software useful. Maybe give me money (like $10 dollars?) on my <a href="ko-fi.com/readwithai">kofi</a>.*
+
+If you find **this** piece of software useful. Maybe give me money (like $10 dollars?) on my <a href="ko-fi.com/readwithai">kofi</a>.
