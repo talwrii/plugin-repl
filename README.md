@@ -1,13 +1,13 @@
 # Plugin repl - In-editor Scripting and Rapid Plugin Development
 [@readwithai](https://x.com/readwithai) ([Install](https://obsidian.md/plugins?id=plugin-repl), [🦋](https://bsky.app/profile/readwithai.bsky.social), [𝕏](https://x.com/readwithai), [blog](https://readwithai.substack.com/), [▶️](https://www.youtube.com/@readerai/shorts), [support](https:://ko-fi.com/readwithai), [Plugin REPL docs](https://readwithai.substack.com/p/obsidian-plugin-repl))
 
-Rapidly automate tasks from within notes. Test code for plugins without having to reload.
+Rapidly automate tasks from within notes. Rapidly test and iterate on code for plugins without needing to reload.
 
-This plugin adds an emacs-like read evaluate print loop (REPL) to Obsidian.
-This lets you execute JavaScript directly in a document *and*, importantly, interact with Obsidian's plugin API to make Obsidian do things (like move the cursor, insert text, open files, etc).
-You can also define new commands in JavaScript.
+Plugin REPL adds an Emacs-like read evaluate print loop (REPL) to Obsidian.
+This lets you execute JavaScript directly in a document with a single key-press and see the result.
+It lets you interact with Obsidian's plugin API to make Obsidian do things (move the cursor, insert text, open files, etc). Once you have working code you define new commands directly in JavaScript within Obsidina. 
 
-This can be useful when developing plugins or for "light-weight" scripting without having to develop a full plugin yourself.
+Plugin REPL can be useful when developing plugins or for "light-weight" scripting without having to develop a full plugin yourself.
 
 A range of convenience functions, partly inspired by emacs, is also provided to speed up development of straight-forward features.
 
@@ -192,11 +192,10 @@ newCommand(async function templater_from_file() {
 })
 ```
 
-
 ## Importing modules
-Modules in Obsidian work in an interesting way that makes installing from NPM a little tricky. There is a [technical explanation here](https://github.com/talwrii/plugin-repl-imports#technical).
+Modules in Obsidian work in an interesting way that makes installing from [NPM](https://www.npmjs.com/) a little tricky. There is a [technical explanation here](https://github.com/talwrii/plugin-repl-imports#technical).
 
-There is a system to provide imports to Plugin REPL provided by [this repository](https://github.com/talwrii/plugin-repl-imports). To use it, you have to checkout a repository into your vault, update a text file, run a make command and then you can use the `replRequire` function within Obsidian, as described in the [docs](https://github.com/talwrii/plugin-repl-imports).
+Plugin REPL has a system to let you import npm modules provided by [this repository](https://github.com/talwrii/plugin-repl-imports). To use it, you have to checkout a repository into your vault, update a text file, run a make command and then you can use the `replRequire` function within Obsidian
 
 ## Some questions and answers about Plugin REPL
 [Questions and answers](questions.md)
@@ -225,11 +224,8 @@ This plugin is highly influenced by [Emacs](https://www.gnu.org/software/emacs/)
 This code exposes and wraps the [Obsidian plugin API](https://docs.obsidian.md/Plugins/Getting+started/Build+a+plugin) - as all plugins do - but Plugin REPL does this in a rather more direct / turing-complete way.
 
 ## About me
-
 I make productivity tools and AI tools related to reading and research.
 
-
 If that sounds interesting you can follow me on <a href="https://x.com/readwithai">twitter</a> or <a href="https://bsky.app/profile/readwithai.bsky.social">bluesky</a>.  I also write about these topics on <a href="https://readwithai.substack.com/readwithai">substack</a>.
-
 
 If you find **this** piece of software useful. Maybe give me money (like $10 dollars?) on my <a href="ko-fi.com/readwithai">kofi</a>.
