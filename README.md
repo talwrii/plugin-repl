@@ -5,11 +5,11 @@ Rapidly automate tasks from within notes. Rapidly test and iterate on code for p
 
 Plugin REPL adds an Emacs-like read evaluate print loop (REPL) to Obsidian.
 This lets you execute JavaScript directly in a document with a single key-press and see the result.
-It lets you interact with Obsidian's plugin API to make Obsidian do things (move the cursor, insert text, open files, etc). Once you have working code you define new commands directly in JavaScript within Obsidina. 
+It lets you interact with Obsidian's plugin API to make Obsidian do things (move the cursor, insert text, open files, etc). Once you have working code you define new commands directly in JavaScript.
 
-Plugin REPL can be useful when developing plugins or for "light-weight" scripting without having to develop a full plugin yourself.
+Plugin REPL can be useful when developing plugins or for "light-weight" scripting without having to develop a full plugin.
 
-A range of convenience functions, partly inspired by emacs, is also provided to speed up development of straight-forward features.
+A range of convenience functions, partly inspired by emacs, is provided to speed up development of straight-forward features.
 
 *I am in no way affiliated with Obsidian. This is a third-party plugin.*
 
@@ -33,11 +33,11 @@ You should then be able to enable the plugin in the "Community Plugins" section 
 
 ## Using
 For basic usage, write a JavaScript expression on a line, then run the command "Execute the current line or selection" in the Command Palette. You can also select a region and run this command.
-I would advise binding `CTRL-J` to this command.
+I would advise making the `CTRL-J` run this command with a hotkey.
 
-Other commands are provided which you can find the command palette. These allow you to execute a region of JavaScript without inserting the result, or read JavaScript in a popup window to run.
+Some other commands are provided which you can find the Command Palette by typing "Plugin REPL . These allow you to execute a region of JavaScript without inserting the result, or read JavaScript to run from a popup window.
 
-To define a *command* ( run [Command Palette]( https://help.obsidian.md/Plugins/Command+palette) or a hotkey ) use the [newCommand](#commands) function.
+To define a *command* ( run via the [Command Palette]( https://help.obsidian.md/Plugins/Command+palette) or a hotkey ) use the [newCommand](#commands) function.
 
 The code you write can make use of the [convenience functions and variables](#convenience). This may well provide all the functionality you need for basic scripts, but Plugin REPL also gives you access to much of [Obsidian's plugin API](https://docs.obsidian.md/Plugins/Getting+started/Build+a+plugin)
 through the `app`, `editor` and `repl` (plugin) objects.
