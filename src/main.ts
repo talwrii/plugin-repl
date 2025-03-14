@@ -23,6 +23,7 @@ import { promptCommand } from './promptCommand'
 import { popup } from './popup'
 import { openSetting } from './settings'
 import { templater_expand } from './templater'
+import { test } from './test'
 
 interface PrivateMarkdownView extends MarkdownView {
     titleEl: HTMLElement
@@ -335,6 +336,12 @@ export default class ReplPlugin extends Plugin {
             "view", view,
             "The view for the current not (See Obsidian api)"
         )
+
+        this.addToScopeWithDoc(
+            "test", test,
+            "Run some tests."
+        )
+
     }
 
     makeNewCommand() {
