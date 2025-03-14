@@ -183,6 +183,10 @@ export default class ReplPlugin extends Plugin {
             "plugin", plugin.bind(null, this.app),
             "(id: string) Return the plugin object for the plugin with id (see app.plugins.plugins) to get names ")
         this.addToScopeWithDoc(
+            "plugins", plugin.bind(null, this.app),
+            "Return a list of IDs of plugins")
+
+        this.addToScopeWithDoc(
             "promptString", promptString.bind(null, this.app),
             "(prompt?: string) Read a string from a popup window "
         )
@@ -419,8 +423,12 @@ async function openFile(app: App, name: string) {
     await app.workspace.openLinkText(name, "")
 }
 
-function plugin(app: PrivateApp, name: string) {
+function plugin(app: PrivateApp, name: string): Plugin {
     return app.plugins.getPlugin(name)
+}
+
+function plugins(app: PrivateApp, name: string): string[] {
+    return Object.keys(app.plugins.plugins)
 }
 
 function runProc(commandAndArgs: string | Array<string>, input?: string): string {

@@ -111,6 +111,7 @@ Various convenience functions are provided:
 
 ### Plugins and Modules
 * `plugin(s:string)` - Get the object for a plugin. You may be able to reuse features from another plugin with this.
+* `plugins()` '- Get a list of all the string IDs of plugins used by Obsidian.
 * `getDv()` - Get the dataview object
 * `replRequire(s: string)` - Import the node module installed using [Plugin Repl Imports](
 https://github.com/talwrii/plugin-repl-imports)

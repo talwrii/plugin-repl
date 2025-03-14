@@ -25,7 +25,8 @@ export interface PrivateCommands {
 }
 
 export interface PrivatePlugins {
-    getPlugin: (_: string) => Plugin
+    getPlugin: (_: string) => Plugin,
+    plugins: { [_: string]: Plugin }
 }
 
 export interface DataviewPlugin extends Plugin {
