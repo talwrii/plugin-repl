@@ -33,26 +33,26 @@ You should then be able to enable the plugin in the "Community Plugins" section 
 
 ## Using
 For basic usage, write a JavaScript expression on a line, then run the command "Execute the current line or selection" in the Command Palette. You can also select a region and run this command.
-I would advise making the `CTRL-J` run this command with a hotkey.
+I would advise making `CTRL-J` run this command with a hotkey.
 
-Some other commands are provided which you can find the Command Palette by typing "Plugin REPL . These allow you to execute a region of JavaScript without inserting the result, or read JavaScript to run from a popup window.
+Some other commands are provided. You can find them in the Command Palette by typing "Plugin REPL". These let you to execute a region of JavaScript without inserting the result, or read JavaScript to run from a popup window.
 
-To define a *command* ( run via the [Command Palette]( https://help.obsidian.md/Plugins/Command+palette) or a hotkey ) use the [newCommand](#commands) function.
+To define a *command* (run via the [Command Palette]( https://help.obsidian.md/Plugins/Command+palette) or a hotkey) use the [newCommand](#commands) function.
 
 The code you write can make use of the [convenience functions and variables](#convenience). This may well provide all the functionality you need for basic scripts, but Plugin REPL also gives you access to much of [Obsidian's plugin API](https://docs.obsidian.md/Plugins/Getting+started/Build+a+plugin)
 through the `app`, `editor` and `repl` (plugin) objects.
 
 The `dir` and `fuzzyDir` methods can help explore these objects allong with the [API documentation](https://docs.obsidian.md/Plugins/Getting+started/Build+a+plugin).
 
-If you want functionality, such as commands, to [rerun each time Obsidian loads](#startup) you can put it in a `repl.md` file in your vault.
+If you want functionality, such as defined commands, to [rerun each time Obsidian loads](#startup) you can put this functionality in a `repl.md` file in your vault.
 
 IMPORTANT LIMITATION. Functions that you define are not shared between different invocations of plugin repl. To share them, you must instead define them as variables like so: `var f = function f() {`
 
 ## Documentation
-This page provides an overview of functionality you might like to look at the [Obsidian and Plugin Repl Cookbook](https://readwithai.substack.com/p/obsidian-plugin-repl-cookbook) that provides various examples of how plugin repl can be used.
+This page provides an overview of functionality. You might like to look at the [Obsidian and Plugin Repl Cookbook](https://readwithai.substack.com/p/obsidian-plugin-repl-cookbook), which provides various practical examples of how Plugin REPL can be used.
 
 ## Convenience functions provided
-<a name="convenience"> </a>
+<a name="convenience"></a>
 Various convenience functions are provided:
 
 * `functions()` - List the convenience functions and methods provided
@@ -88,7 +88,6 @@ Various convenience functions are provided:
 * `forwardChar(count?: number)` - Move count (or one) character forward
 * `endOfLine()` - Move to the end of the line
 
-
 * `selection()` - Get the text contained in the selection
 
 * `bufferString()` - Return a string containing the entire text of the buffer
@@ -118,14 +117,14 @@ https://github.com/talwrii/plugin-repl-imports)
 
 
 ### API access
-* `repl` is the plugin object for repl.
-* `editor` is the editor object. You can use this to write to current-file
-* `app` is the application object.
+* `repl` is the Obsidian plugin object for Plugin REPL. You can use this to define commands and register extensions.
+* `editor` is the Editor object. You can use this to edit to the current note
+* `app` is the global application object.
 
 ## Defining commands
 <a name="commands"></a>
-The function `newCommand` will create a new command from a function. You can then
-define a hotkey to this command.
+The function `newCommand` will create a new command which calls a function. Once you have defined a command, you can
+define a hotkey to run this command and so call this function.
 
 ```javascript
 newCommand(function new_command_name() {
@@ -134,9 +133,10 @@ newCommand(function new_command_name() {
 ```
 
 creates a command with the name "new command name" (and the id `new_command_name`).
-You can use all Plugin REPL's extra functions and variables (`app`, `editor` etc) in this function.
 
-If you want to test this funtion by hand you can do the following
+You can use all Plugin REPL's extra functions and variables (`app`, `editor` etc) within this function.
+
+If you want to test this funtion by hand, you can do the following:
 
 ```javascript
 var f = newCommand(function new_command_name() {
@@ -144,17 +144,17 @@ var f = newCommand(function new_command_name() {
 })
 ```
 
-You can then call `f()` using eval to test it.
+You can then call `f()` by executing code to test it.
 
 ## Running code at startup
 <a name="startup"> </a>
 If you want code to run at startup, such as for [defining commands](#commands), then you can place this code in a special file called `repl.md`. If this file exists, it is read when Obsidian starts (or is reloaded) and the code in it is executed.
 
 ## Asynchronous code
-For convenience, if you call an asynchronous function, plugin repl will store the result of the call in the underscore variable (`_`) or, if there was an error, the error is stored in `_error`.
+For convenience, if you call an asynchronous function, Plugin REPL will store the result in the variable `_`.  If there was an error, the error is stored in `_error`.
 
 ## Images and Graphs
-In order to output images and graphs you can use code-blocks. These give you access to an `el` HTML object you can use for arbitrary HTML output. Note that all JavaScript executes in the same scope by design: Plugin REPL is for scripting.
+In order to output images and graphs, you can use code-blocks. These give you access to an `el` HTML object you can use to store arbitrary HTML. Note that all JavaScript executes in a single global scope by design.
 
 ````
 ```plugin-repl
@@ -165,7 +165,7 @@ el.appendText("hello")
 The [dataview plugin](https://blacksmithgu.github.io/obsidian-dataview/) provides
 functionality to query your obsidian vault. For example, it can return pages or bullet points that match a particular query.
 
-If you have installed the dataview plugin, plugin repl gives you access to a dataview object `dv` which can be used to query pages.
+If you have installed the dataview plugin, Plugin REPL gives you access to a dataview object `dv` which can be used to query all notes.
 
 
 The following code returns the first list of the page called `templates/daily.md`.
@@ -176,17 +176,17 @@ dv.pages().filter((x) => x.file.path == "templates/daily.md")[0].file.lists[0]
 ```
 
 ## Templater support
-The [Templater](https://github.com/SilentVoid13/Templater) library provides functionality to insert templates with some parts of the template derived from JavaScript code. If you have installed Templater you can use
+The [Templater](https://github.com/SilentVoid13/Templater) library provides functionality to insert templates with some parts of the template derived from JavaScript code. If you have installed Templater, you can use
 the async `templater_expand` function to expand template strings.
 
-This creates a command that inserts a files tags using a template.
+This creates a command that inserts a files tags using a template:
 ```
 newCommand(async function templater_example() {
     insert(await templater_expand("The files tags: <% tp.file.tags %>"))
 })
 ```
 
-If you want to expand a template for a file you can use `readFile`:
+If you want to expand a template for a file, you can use `readFile`:
 ```
 newCommand(async function templater_from_file() {
     insert(await templater_expand(await readFile("myTemplate")))
@@ -218,7 +218,7 @@ This plugin was based on the [Obsidian sample plugin](https://github.com/obsidia
 
 It uses the [shell-quote](https://github.com/ljharb/shell-quote) library by ljharb and the source code for this is compiled into distribited `main.js`. This is under an MIT license.
 
-At runtime, it binds against [dataview](https://blacksmithgu.github.io/obsidian-dataview/) by blacksmithg if you use dataview functionality. This is under an MIT license.
+At runtime, it binds against [dataview](https://blacksmithgu.github.io/obsidian-dataview/) by blacksmith,  should you use dataview functionality. This is under an MIT license.
 
 This plugin is highly influenced by [Emacs](https://www.gnu.org/software/emacs/) (as are most text editors and a lot of software).
 
