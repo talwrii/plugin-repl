@@ -13,6 +13,8 @@ A range of convenience functions, partly inspired by emacs, is provided to speed
 
 *I am in no way affiliated with Obsidian. This is a third-party plugin.*
 
+![Downloads](https://img.shields.io/github/downloads/talwrii/plugin-repl/total?color=573E7A&logo=github&style=for-the-badge)
+
 # Demo
 ![demo](demo.gif)
 
