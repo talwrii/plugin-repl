@@ -6,7 +6,7 @@ import {
 import { execFileSync, execSync } from 'child_process'
 import { parse as shellParse, quote as shellQuote } from 'shell-quote';
 import { expandRegionWithRegexp } from './editorUtils'
-import { jump, forwardChar, point, pointMax, pointMin, lineNumber, mark, endOfLine, endOfLinePoint, atEndOfBuffer } from './bufferMotion'
+import { jump, jumpLine, forwardChar, point, pointMax, pointMin, lineNumber, mark, endOfLine, endOfLinePoint, atEndOfBuffer } from './bufferMotion'
 import { forwardRegexp, atRegexp } from './regexpMotion'
 import { bufferString, restOfLine } from './bufferData'
 
@@ -16,8 +16,7 @@ import { Scope } from './scope'
 import { History } from './history'
 import { PrivateApp, DataviewPlugin } from "./types"
 
-
-import { fuzzySelect } from './fuzzy'
+import { fuzzySelect, fuzzySelectPair } from './fuzzy'
 import { promptString } from './prompt'
 import { promptCommand } from './promptCommand'
 import { popup } from './popup'
@@ -225,9 +224,11 @@ export default class ReplPlugin extends Plugin {
         )
         this.addToScopeWithDoc(
             "fuzzySelect", fuzzySelect.bind(null, this.app),
-            "(options: Array<string>, prompt?: string) Select from options with fuzzy search"
+            "(options: Array<string>, prompt?: string) Select from options with fuzzy search")
+        this.addToScopeWithDoc(
+            "fuzzySelectPair", fuzzySelectPair.bind(null, this.app),
+            "(options: Array<string, any>, prompt?: string) Select items from a list using label strings provided")
 
-        )
         this.addToScopeWithDoc(
             "openUrl", openUrl,
             "(url: string) Open this url in a browser "
@@ -315,10 +316,16 @@ export default class ReplPlugin extends Plugin {
             "pointMax", pointMax.bind(null, editor),
             "Returns the cursor positoin at the beginning of the note"
         )
+
         this.addToScopeWithDoc(
             "jump", jump.bind(null, editor),
             "Jump to the given point."
         )
+        this.addToScopeWithDoc(
+            "jumpLine", jumpLine.bind(null, editor),
+            "Jump to the given line."
+        )
+
         this.addToScopeWithDoc(
             "selection", selection.bind(null, editor),
             "Returns the text of the selection."

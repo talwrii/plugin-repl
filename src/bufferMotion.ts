@@ -1,5 +1,9 @@
 import { Editor, EditorPosition } from 'obsidian';
 
+export function jumpLine(editor: Editor, line: number) {
+    return editor.setCursor({ ch: 0, line: line })
+}
+
 export function jump(editor: Editor, position: EditorPosition) {
     return editor.setCursor(position)
 }

@@ -1,20 +1,27 @@
 import { FuzzySuggestModal, App } from 'obsidian';
 
 
-
 export function fuzzySelect(app: App, choices: Array<string>, prompt?: string) {
+    return new Promise((reject, resolve) => {
+        let selector = new FuzzySelector(app, prompt || "select:", choices.map((x) => [x, x]), [reject, resolve])
+        selector.run()
+    })
+}
+
+
+export function fuzzySelectPair(app: App, choices: Array<[string, any]>, prompt?: string) {
     return new Promise((reject, resolve) => {
         let selector = new FuzzySelector(app, prompt || "select:", choices, [reject, resolve])
         selector.run()
     })
 }
 
-class FuzzySelector extends FuzzySuggestModal<string> {
+class FuzzySelector extends FuzzySuggestModal<[string, any]> {
     resolve: (_: any) => void
     reject: (_: any) => void
-    choices: Array<string>
+    choices: Array<[string, any]>
 
-    constructor(app: App, prompt: string, choices: Array<string>, callbacks: [resolv: (_: any) => void, reject: (_: any) => void]) {
+    constructor(app: App, prompt: string, choices: Array<[string, any]>, callbacks: [resolv: (_: any) => void, reject: (_: any) => void]) {
         const [resolve, reject] = callbacks
         super(app);
         this.setPlaceholder(prompt);
@@ -23,16 +30,16 @@ class FuzzySelector extends FuzzySuggestModal<string> {
         this.choices = choices
     }
 
-    getItems(): string[] {
-        return this.choices;
+    getItems(): Array<[string, any]> {
+        return this.choices
     }
 
-    getItemText(choice: string): string {
-        return choice
+    getItemText(choice: [string, any]): string {
+        return choice[0]
     }
 
-    onChooseItem(item: string): void {
-        this.resolve(item)
+    onChooseItem(item: [string, any]): void {
+        this.resolve(item[1])
     }
 
     run() {
