@@ -1,5 +1,5 @@
 # Plugin REPL - In Editor JavaScript Scripting for Automation
-**readwithai** - [X](https://x.com/readwithai)  -[🦋](https://bsky.app/profile/readwithai.bsky.social) - [blog](https://readwithai.substack.com/) - [**machine-aided reading**](https://www.reddit.com/r/machineAidedReading/)
+**readwithai** - [X](https://x.com/readwithai)  -[🦋](https://bsky.app/profile/readwithai.bsky.social) - [blog](https://readwithai.substack.com/) - [**machine-aided reading**](https://www.reddit.com/r/machineAidedReading/) -  ![stars](https://img.shields.io/github/stars/talwrii/plugin-repl)
 
 Rapidly automate tasks from within notes. Rapidly test and iterate on code for plugins without needing to reload.
 
@@ -14,7 +14,6 @@ A range of convenience functions, partly inspired by emacs, is provided to speed
 *I am in no way affiliated with Obsidian. This is a third-party plugin.*
 
 ![Downloads](https://img.shields.io/github/downloads/talwrii/plugin-repl/total?color=573E7A&logo=github&style=for-the-badge)
-![stars](https://img.shields.io/github/stars/talwrii/plugin-repl)
 [<kbd> <br> Plugin REPL Documentation <br> </kbd>](https://readwithai.substack.com/p/obsidian-plugin-repl)
 
 # Demo
